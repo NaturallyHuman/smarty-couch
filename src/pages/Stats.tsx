@@ -43,38 +43,38 @@ const Stats = () => {
   }, { cat: 'None', data: { correct: 0, total: 0 } });
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-8">
-      <div className="w-full max-w-4xl text-center">
-        <h1 className="mb-4 text-6xl font-bold">Lifetime Stats</h1>
-        <p className="mb-12 text-2xl text-muted-foreground">Your trivia journey so far</p>
+    <div className="flex min-h-screen flex-col items-center justify-center px-[8vw] py-6">
+      <div className="w-full max-w-[85vw] text-center">
+        <h1 className="mb-4 text-5xl font-bold">Lifetime Stats</h1>
+        <p className="mb-12 text-xl text-muted-foreground">Your trivia journey so far</p>
 
         <div className="mb-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-2xl bg-card p-6">
             <Trophy className="mx-auto mb-3 h-12 w-12 text-primary" />
-            <div className="text-4xl font-bold text-primary">
+            <div className="text-3xl font-bold text-primary">
               {stats.highestScore.toLocaleString()}
             </div>
-            <div className="text-xl text-muted-foreground">Highest Score</div>
+            <div className="text-lg text-muted-foreground">Highest Score</div>
           </div>
 
           <div className="rounded-2xl bg-card p-6">
             <Zap className="mx-auto mb-3 h-12 w-12 text-warning" />
-            <div className="text-4xl font-bold text-warning">{stats.longestStreak}</div>
-            <div className="text-xl text-muted-foreground">Longest Streak</div>
+            <div className="text-3xl font-bold text-warning">{stats.longestStreak}</div>
+            <div className="text-lg text-muted-foreground">Longest Streak</div>
           </div>
 
           <div className="rounded-2xl bg-card p-6">
             <Target className="mx-auto mb-3 h-12 w-12 text-success" />
-            <div className="text-4xl font-bold text-success">{stats.timesPlayed}</div>
-            <div className="text-xl text-muted-foreground">Games Played</div>
+            <div className="text-3xl font-bold text-success">{stats.timesPlayed}</div>
+            <div className="text-lg text-muted-foreground">Games Played</div>
           </div>
 
           <div className="rounded-2xl bg-card p-6">
             <TrendingUp className="mx-auto mb-3 h-12 w-12 text-foreground" />
-            <div className="text-4xl font-bold">
+            <div className="text-3xl font-bold">
               {categoryEntries.reduce((sum, [, data]) => sum + data.correct, 0)}
             </div>
-            <div className="text-xl text-muted-foreground">Total Correct</div>
+            <div className="text-lg text-muted-foreground">Total Correct</div>
           </div>
         </div>
 

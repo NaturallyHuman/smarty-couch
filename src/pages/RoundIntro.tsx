@@ -39,12 +39,12 @@ const RoundIntro = () => {
   }, [gameState, navigate]);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-8">
-      <div className="w-full max-w-3xl text-center">
-        <h1 className="mb-4 text-6xl font-bold">Get Ready!</h1>
-        <p className="mb-4 text-3xl text-primary">{category} Trivia</p>
+    <div className="flex min-h-screen flex-col items-center justify-center px-[8vw] py-6">
+      <div className="w-full max-w-[80vw] text-center">
+        <h1 className="mb-4 text-5xl font-bold">Get Ready!</h1>
+        <p className="mb-4 text-2xl text-primary">{category} Trivia</p>
         {gameState && (
-          <p className="mb-8 text-2xl text-muted-foreground">
+          <p className="mb-8 text-xl text-muted-foreground">
             Round {gameState.currentRound} of {gameState.totalRounds}
             {gameState.mode === 'two-player' && ` • ${gameState.players[gameState.currentPlayer].name}`}
           </p>
@@ -53,20 +53,20 @@ const RoundIntro = () => {
         <div className="mb-16 grid gap-8 md:grid-cols-3">
           <div className="rounded-2xl bg-card p-6">
             <Target className="mx-auto mb-3 h-12 w-12 text-primary" />
-            <div className="text-4xl font-bold">6</div>
-            <div className="text-xl text-muted-foreground">Questions</div>
+            <div className="text-3xl font-bold">6</div>
+            <div className="text-lg text-muted-foreground">Questions</div>
           </div>
 
           <div className="rounded-2xl bg-card p-6">
             <Clock className="mx-auto mb-3 h-12 w-12 text-primary" />
-            <div className="text-4xl font-bold">10s</div>
-            <div className="text-xl text-muted-foreground">Per Question</div>
+            <div className="text-3xl font-bold">10s</div>
+            <div className="text-lg text-muted-foreground">Per Question</div>
           </div>
 
           <div className="rounded-2xl bg-card p-6">
             <TrendingUp className="mx-auto mb-3 h-12 w-12 text-primary" />
-            <div className="text-4xl font-bold">Ramps Up</div>
-            <div className="text-xl text-muted-foreground">Difficulty</div>
+            <div className="text-3xl font-bold">Ramps Up</div>
+            <div className="text-lg text-muted-foreground">Difficulty</div>
           </div>
         </div>
 

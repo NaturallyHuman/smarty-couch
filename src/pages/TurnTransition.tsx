@@ -38,15 +38,15 @@ const TurnTransition = () => {
   const currentPlayer = gameState.players[gameState.currentPlayer];
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-8">
-      <div className="w-full max-w-2xl text-center">
-        <h1 className="mb-8 text-6xl font-bold">
+    <div className="flex min-h-screen flex-col items-center justify-center px-[8vw] py-6">
+      <div className="w-full max-w-[80vw] text-center">
+        <h1 className="mb-8 text-5xl font-bold">
           {currentPlayer.name}'s Turn
         </h1>
-        <p className="mb-4 text-3xl text-muted-foreground">
+        <p className="mb-4 text-2xl text-muted-foreground">
           Round {gameState.currentRound} of {gameState.totalRounds}
         </p>
-        <p className="mb-12 text-2xl text-muted-foreground">
+        <p className="mb-12 text-xl text-muted-foreground">
           Get ready for your round!
         </p>
         <TVButton

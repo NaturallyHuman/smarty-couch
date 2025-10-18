@@ -85,12 +85,12 @@ const GameOver = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-8">
-      <div className="w-full max-w-4xl">
+    <div className="flex min-h-screen flex-col items-center justify-center px-[8vw] py-6">
+      <div className="w-full max-w-[85vw]">
         <div className="mb-8 text-center">
           <Trophy className="mx-auto mb-4 h-24 w-24 text-primary" />
-          <h1 className="mb-2 text-6xl font-bold">Game Over!</h1>
-          <p className="text-2xl text-muted-foreground">
+          <h1 className="mb-2 text-5xl font-bold">Game Over!</h1>
+          <p className="text-xl text-muted-foreground">
             {gameState.mode === 'two-player' ? 'Final Results' : 'Great job!'}
           </p>
         </div>

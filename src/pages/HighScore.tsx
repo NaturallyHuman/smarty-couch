@@ -29,19 +29,19 @@ const HighScore = () => {
   }, [navigate]);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-8">
-      <div className="w-full max-w-3xl text-center">
+    <div className="flex min-h-screen flex-col items-center justify-center px-[8vw] py-6">
+      <div className="w-full max-w-[80vw] text-center">
         <Sparkles className="mx-auto mb-6 h-20 w-20 text-primary animate-pulse" />
         
-        <h1 className="mb-4 text-5xl font-bold">High Score Challenge</h1>
-        <p className="mb-12 text-2xl text-muted-foreground">
+        <h1 className="mb-4 text-4xl font-bold">High Score Challenge</h1>
+        <p className="mb-12 text-xl text-muted-foreground">
           Think you can beat your personal best?
         </p>
 
         <div className="mb-12 rounded-3xl bg-gradient-to-br from-primary/30 via-purple-500/20 to-primary/30 p-12 shadow-[0_0_40px_hsl(var(--primary)/0.3)]">
           <Trophy className="mx-auto mb-4 h-24 w-24 text-primary" />
-          <div className="mb-3 text-3xl text-muted-foreground">Your High Score</div>
-          <div className="text-8xl font-bold text-primary">
+          <div className="mb-3 text-2xl text-muted-foreground">Your High Score</div>
+          <div className="text-7xl font-bold text-primary">
             {stats.highestScore.toLocaleString()}
           </div>
         </div>
