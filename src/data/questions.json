@@ -1,0 +1,242 @@
+[
+  {
+    "id": "mov1",
+    "category": "Movies",
+    "difficulty": 1,
+    "text": "Who directed the movie 'Titanic'?",
+    "choices": ["James Cameron", "Steven Spielberg", "Christopher Nolan", "Martin Scorsese"],
+    "correctIndex": 0
+  },
+  {
+    "id": "mov2",
+    "category": "Movies",
+    "difficulty": 2,
+    "text": "Which movie won Best Picture at the 2020 Oscars?",
+    "choices": ["1917", "Parasite", "Joker", "Once Upon a Time in Hollywood"],
+    "correctIndex": 1
+  },
+  {
+    "id": "mov3",
+    "category": "Movies",
+    "difficulty": 3,
+    "text": "In 'The Matrix', what color pill does Neo take?",
+    "choices": ["Blue", "Red", "Green", "Yellow"],
+    "correctIndex": 1
+  },
+  {
+    "id": "mov4",
+    "category": "Movies",
+    "difficulty": 4,
+    "text": "Which actor played the Joker in 'The Dark Knight'?",
+    "choices": ["Jared Leto", "Joaquin Phoenix", "Heath Ledger", "Jack Nicholson"],
+    "correctIndex": 2
+  },
+  {
+    "id": "mov5",
+    "category": "Movies",
+    "difficulty": 5,
+    "text": "What is the name of the fictional African country in 'Black Panther'?",
+    "choices": ["Zamunda", "Wakanda", "Genovia", "Sokovia"],
+    "correctIndex": 1
+  },
+  {
+    "id": "mov6",
+    "category": "Movies",
+    "difficulty": 6,
+    "text": "Which film features the quote 'Here's looking at you, kid'?",
+    "choices": ["Gone with the Wind", "Casablanca", "The Maltese Falcon", "Citizen Kane"],
+    "correctIndex": 1
+  },
+  {
+    "id": "sci1",
+    "category": "Science",
+    "difficulty": 1,
+    "text": "What planet is known as the Red Planet?",
+    "choices": ["Mars", "Venus", "Jupiter", "Saturn"],
+    "correctIndex": 0
+  },
+  {
+    "id": "sci2",
+    "category": "Science",
+    "difficulty": 2,
+    "text": "What is the chemical symbol for gold?",
+    "choices": ["Go", "Gd", "Au", "Ag"],
+    "correctIndex": 2
+  },
+  {
+    "id": "sci3",
+    "category": "Science",
+    "difficulty": 3,
+    "text": "What is the speed of light?",
+    "choices": ["300,000 km/s", "150,000 km/s", "450,000 km/s", "600,000 km/s"],
+    "correctIndex": 0
+  },
+  {
+    "id": "sci4",
+    "category": "Science",
+    "difficulty": 4,
+    "text": "Who developed the theory of general relativity?",
+    "choices": ["Isaac Newton", "Niels Bohr", "Albert Einstein", "Stephen Hawking"],
+    "correctIndex": 2
+  },
+  {
+    "id": "sci5",
+    "category": "Science",
+    "difficulty": 5,
+    "text": "What is the largest organ in the human body?",
+    "choices": ["Liver", "Brain", "Skin", "Heart"],
+    "correctIndex": 2
+  },
+  {
+    "id": "sci6",
+    "category": "Science",
+    "difficulty": 6,
+    "text": "What particle is known as the 'God particle'?",
+    "choices": ["Neutron", "Proton", "Electron", "Higgs boson"],
+    "correctIndex": 3
+  },
+  {
+    "id": "his1",
+    "category": "History",
+    "difficulty": 1,
+    "text": "In which year did World War II end?",
+    "choices": ["1943", "1944", "1945", "1946"],
+    "correctIndex": 2
+  },
+  {
+    "id": "his2",
+    "category": "History",
+    "difficulty": 2,
+    "text": "Who was the first President of the United States?",
+    "choices": ["Thomas Jefferson", "George Washington", "John Adams", "Benjamin Franklin"],
+    "correctIndex": 1
+  },
+  {
+    "id": "his3",
+    "category": "History",
+    "difficulty": 3,
+    "text": "Which ancient wonder is still standing today?",
+    "choices": ["Hanging Gardens of Babylon", "Colossus of Rhodes", "Great Pyramid of Giza", "Lighthouse of Alexandria"],
+    "correctIndex": 2
+  },
+  {
+    "id": "his4",
+    "category": "History",
+    "difficulty": 4,
+    "text": "What year did the Berlin Wall fall?",
+    "choices": ["1987", "1988", "1989", "1990"],
+    "correctIndex": 2
+  },
+  {
+    "id": "his5",
+    "category": "History",
+    "difficulty": 5,
+    "text": "Who was the longest-reigning British monarch before Elizabeth II?",
+    "choices": ["Queen Victoria", "King George III", "King Henry VIII", "Queen Anne"],
+    "correctIndex": 0
+  },
+  {
+    "id": "his6",
+    "category": "History",
+    "difficulty": 6,
+    "text": "In what year was the Magna Carta signed?",
+    "choices": ["1066", "1215", "1415", "1515"],
+    "correctIndex": 1
+  },
+  {
+    "id": "spo1",
+    "category": "Sports",
+    "difficulty": 1,
+    "text": "How many players are on a soccer team?",
+    "choices": ["9", "10", "11", "12"],
+    "correctIndex": 2
+  },
+  {
+    "id": "spo2",
+    "category": "Sports",
+    "difficulty": 2,
+    "text": "Which country has won the most FIFA World Cups?",
+    "choices": ["Germany", "Argentina", "Brazil", "Italy"],
+    "correctIndex": 2
+  },
+  {
+    "id": "spo3",
+    "category": "Sports",
+    "difficulty": 3,
+    "text": "In which sport would you perform a 'slam dunk'?",
+    "choices": ["Volleyball", "Basketball", "Tennis", "Baseball"],
+    "correctIndex": 1
+  },
+  {
+    "id": "spo4",
+    "category": "Sports",
+    "difficulty": 4,
+    "text": "Who has won the most Olympic gold medals?",
+    "choices": ["Usain Bolt", "Simone Biles", "Michael Phelps", "Carl Lewis"],
+    "correctIndex": 2
+  },
+  {
+    "id": "spo5",
+    "category": "Sports",
+    "difficulty": 5,
+    "text": "What is the only sport to be played on the moon?",
+    "choices": ["Baseball", "Golf", "Tennis", "Frisbee"],
+    "correctIndex": 1
+  },
+  {
+    "id": "spo6",
+    "category": "Sports",
+    "difficulty": 6,
+    "text": "In what year were the first modern Olympics held?",
+    "choices": ["1892", "1896", "1900", "1904"],
+    "correctIndex": 1
+  },
+  {
+    "id": "gen1",
+    "category": "General",
+    "difficulty": 1,
+    "text": "What is the capital of France?",
+    "choices": ["London", "Berlin", "Paris", "Madrid"],
+    "correctIndex": 2
+  },
+  {
+    "id": "gen2",
+    "category": "General",
+    "difficulty": 2,
+    "text": "How many continents are there?",
+    "choices": ["5", "6", "7", "8"],
+    "correctIndex": 2
+  },
+  {
+    "id": "gen3",
+    "category": "General",
+    "difficulty": 3,
+    "text": "What is the largest ocean on Earth?",
+    "choices": ["Atlantic", "Indian", "Arctic", "Pacific"],
+    "correctIndex": 3
+  },
+  {
+    "id": "gen4",
+    "category": "General",
+    "difficulty": 4,
+    "text": "Which element has the chemical symbol 'O'?",
+    "choices": ["Osmium", "Oxygen", "Oganesson", "Osmium"],
+    "correctIndex": 1
+  },
+  {
+    "id": "gen5",
+    "category": "General",
+    "difficulty": 5,
+    "text": "What is the smallest country in the world?",
+    "choices": ["Monaco", "San Marino", "Vatican City", "Liechtenstein"],
+    "correctIndex": 2
+  },
+  {
+    "id": "gen6",
+    "category": "General",
+    "difficulty": 6,
+    "text": "How many time zones does Russia have?",
+    "choices": ["7", "9", "11", "13"],
+    "correctIndex": 2
+  }
+]
