@@ -1,7 +1,7 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.3fe533a49e484049af86938f3b45f5e9',
+  appId: 'app.lovable.couchquizcommander',
   appName: 'couch-quiz-commander',
   webDir: 'dist',
   server: {
