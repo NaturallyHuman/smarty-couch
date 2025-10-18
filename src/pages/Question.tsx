@@ -232,22 +232,10 @@ const Question = () => {
   return (
     <>
       <div className="flex min-h-screen flex-col px-[8vw] py-6">
-        {/* Top Status Bar */}
-        <div className="mb-12 flex items-center justify-between gap-8">
-          {/* Streak */}
-          <div className="flex items-center gap-3 text-2xl font-bold">
-            <Flame className="h-8 w-8 text-warning" />
-            <span>{streak}</span>
-          </div>
-
-          {/* Timer Progress Bar */}
-          <div className="flex-1">
+        {/* Top Status Bar - Timer Only */}
+        <div className="mb-12 flex items-center justify-center">
+          <div className="w-full max-w-[60vw]">
             <TimerBar timeRemaining={timeRemaining} maxTime={QUESTION_TIME} />
-          </div>
-
-          {/* Score */}
-          <div className="text-2xl font-bold">
-            {score}
           </div>
         </div>
 
