@@ -231,31 +231,31 @@ const Question = () => {
 
   return (
     <>
-      <div className="flex h-full w-full flex-col px-[5%] py-[2%]">
-        {/* Top Status Bar - Timer Only */}
-        <div className="mb-[1%] flex items-center justify-center">
-          <div className="w-full max-w-[60%]">
+      <div className="flex h-full w-full flex-col px-[5%] py-[3%]">
+        {/* Top Status Bar - Timer in top left */}
+        <div className="mb-[2%] flex items-start">
+          <div className="w-full max-w-[50%]">
             <TimerBar timeRemaining={timeRemaining} maxTime={QUESTION_TIME} />
           </div>
         </div>
 
         {/* Content Area */}
-        <div className="flex flex-1 flex-col items-center justify-center">
-          <div className="w-full max-w-[85%]">
+        <div className="flex flex-1 flex-col items-center justify-start pt-[2%]">
+          <div className="w-full max-w-[90%]">
             {/* Category */}
-            <h2 className="mb-[1.5%] text-center text-xl text-primary">
+            <h2 className="mb-[3%] text-center text-lg text-muted-foreground">
               {currentQuestion.category}
             </h2>
 
             {/* Question */}
-            <h1 className="mb-[2.5%] text-center text-3xl font-bold leading-tight">
+            <h1 className="mb-[6%] text-center text-4xl font-bold leading-tight">
               {currentQuestion.text}
             </h1>
 
             {/* D-pad Answer Layout */}
-            <div className="relative mx-auto h-[42%] w-full max-w-[80%]">
+            <div className="relative mx-auto h-[400px] w-full max-w-[85%]">
               {/* Top Answer (Up/A) */}
-              <div className="absolute left-1/2 top-0 w-[30%] -translate-x-1/2">
+              <div className="absolute left-1/2 top-0 w-[35%] -translate-x-1/2">
                 <AnswerChoice
                   letter="A"
                   text={currentQuestion.choices[0]}
@@ -273,9 +273,9 @@ const Question = () => {
               </div>
 
               {/* Middle Row */}
-              <div className="absolute left-0 top-1/2 flex w-full -translate-y-1/2 items-center justify-center gap-[2%]">
-                {/* Left Answer (Left/B) - aligned right */}
-                <div className="w-[30%] text-right">
+              <div className="absolute left-0 top-1/2 flex w-full -translate-y-1/2 items-center justify-center gap-[3%]">
+                {/* Left Answer (Left/B) */}
+                <div className="w-[35%]">
                   <AnswerChoice
                     letter="B"
                     text={currentQuestion.choices[1]}
@@ -293,27 +293,27 @@ const Question = () => {
                 </div>
 
                 {/* Center D-pad Visual */}
-                <div className="flex h-32 w-32 shrink-0 items-center justify-center">
-                  <div className="relative h-full w-full opacity-30">
+                <div className="flex h-28 w-28 shrink-0 items-center justify-center">
+                  <div className="relative h-full w-full opacity-20">
                     {/* D-pad shape */}
-                    <div className="absolute left-1/2 top-0 h-10 w-10 -translate-x-1/2 rounded-t-lg border-2 border-foreground/40 bg-background/10 flex items-center justify-center">
-                      <ArrowUp className="h-5 w-5" />
+                    <div className="absolute left-1/2 top-0 h-9 w-9 -translate-x-1/2 rounded-t-lg border-2 border-foreground/40 bg-background/10 flex items-center justify-center">
+                      <ArrowUp className="h-4 w-4" />
                     </div>
-                    <div className="absolute left-0 top-1/2 h-10 w-10 -translate-y-1/2 rounded-l-lg border-2 border-foreground/40 bg-background/10 flex items-center justify-center">
-                      <ArrowLeft className="h-5 w-5" />
+                    <div className="absolute left-0 top-1/2 h-9 w-9 -translate-y-1/2 rounded-l-lg border-2 border-foreground/40 bg-background/10 flex items-center justify-center">
+                      <ArrowLeft className="h-4 w-4" />
                     </div>
-                    <div className="absolute right-0 top-1/2 h-10 w-10 -translate-y-1/2 rounded-r-lg border-2 border-foreground/40 bg-background/10 flex items-center justify-center">
-                      <ArrowRight className="h-5 w-5" />
+                    <div className="absolute right-0 top-1/2 h-9 w-9 -translate-y-1/2 rounded-r-lg border-2 border-foreground/40 bg-background/10 flex items-center justify-center">
+                      <ArrowRight className="h-4 w-4" />
                     </div>
-                    <div className="absolute bottom-0 left-1/2 h-10 w-10 -translate-x-1/2 rounded-b-lg border-2 border-foreground/40 bg-background/10 flex items-center justify-center">
-                      <ArrowDown className="h-5 w-5" />
+                    <div className="absolute bottom-0 left-1/2 h-9 w-9 -translate-x-1/2 rounded-b-lg border-2 border-foreground/40 bg-background/10 flex items-center justify-center">
+                      <ArrowDown className="h-4 w-4" />
                     </div>
-                    <div className="absolute left-1/2 top-1/2 h-6 w-6 -translate-x-1/2 -translate-y-1/2 rounded-full bg-background/20" />
+                    <div className="absolute left-1/2 top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-background/20" />
                   </div>
                 </div>
 
-                {/* Right Answer (Right/D) - aligned left */}
-                <div className="w-[30%] text-left">
+                {/* Right Answer (Right/D) */}
+                <div className="w-[35%]">
                   <AnswerChoice
                     letter="D"
                     text={currentQuestion.choices[3]}
@@ -332,7 +332,7 @@ const Question = () => {
               </div>
 
               {/* Bottom Answer (Down/C) */}
-              <div className="absolute bottom-0 left-1/2 w-[30%] -translate-x-1/2">
+              <div className="absolute bottom-0 left-1/2 w-[35%] -translate-x-1/2">
                 <AnswerChoice
                   letter="C"
                   text={currentQuestion.choices[2]}

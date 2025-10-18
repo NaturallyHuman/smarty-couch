@@ -24,9 +24,9 @@ export const AnswerChoice = ({
     <button
       onClick={onClick}
       className={cn(
-        'relative w-full rounded-xl p-3 text-center transition-all duration-200',
+        'relative w-full rounded-xl p-4 text-center transition-all duration-200',
         'focus:outline-none',
-        'text-lg font-medium leading-tight',
+        'text-xl font-semibold leading-tight',
         {
           // Normal state
           'bg-card/50 hover:bg-primary/10': !isHighlighted && !isSelected && !showFeedback,
