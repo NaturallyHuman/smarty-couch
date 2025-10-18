@@ -81,7 +81,7 @@ const Question = () => {
   };
 
   const handleAnswer = (answerIndex: AnswerDirection) => {
-    if (answerIndex === null || selectedAnswer !== null || feedbackState !== null) return;
+    if (answerIndex === null || selectedAnswer !== null || feedbackState !== null || !currentQuestion) return;
 
     setSelectedAnswer(answerIndex);
     if (timerRef.current) clearInterval(timerRef.current);
@@ -170,7 +170,7 @@ const Question = () => {
         return;
       }
 
-      if (selectedAnswer !== null || feedbackState !== null) return;
+      if (selectedAnswer !== null || feedbackState !== null || !currentQuestion) return;
 
       const directionMap: { [key: string]: AnswerDirection } = {
         ArrowUp: 0,
@@ -188,7 +188,7 @@ const Question = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [highlightedAnswer, selectedAnswer, feedbackState, showPauseDialog, timeRemaining, streak, score]);
+  }, [highlightedAnswer, selectedAnswer, feedbackState, showPauseDialog, timeRemaining, streak, score, currentQuestion]);
 
   useEffect(() => {
     return () => {
