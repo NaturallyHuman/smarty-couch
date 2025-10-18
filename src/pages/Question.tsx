@@ -85,6 +85,7 @@ const Question = () => {
 
     setSelectedAnswer(answerIndex);
     if (timerRef.current) clearInterval(timerRef.current);
+    setTimeRemaining(0);
 
     const isCorrect = answerIndex === currentQuestion.correctIndex;
     const newStreak = isCorrect ? streak + 1 : 0;
