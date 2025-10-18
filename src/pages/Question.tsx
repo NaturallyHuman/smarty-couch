@@ -243,12 +243,12 @@ const Question = () => {
         <div className="flex flex-1 flex-col items-center justify-start pt-[2%]">
           <div className="w-full max-w-[90%]">
             {/* Category */}
-            <h2 className="mb-[3%] text-center text-lg text-muted-foreground">
+            <h2 className="mb-[3%] text-center text-lg text-primary">
               {currentQuestion.category}
             </h2>
 
             {/* Question */}
-            <h1 className="mb-[6%] text-center text-4xl font-bold leading-tight">
+            <h1 className="mb-[6%] text-center text-3xl font-bold leading-tight">
               {currentQuestion.text}
             </h1>
 
