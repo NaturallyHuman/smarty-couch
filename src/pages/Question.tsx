@@ -10,7 +10,7 @@ import { TVButton } from '@/components/TVButton';
 import { Flame, ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react';
 
 const QUESTION_TIME = 10;
-const QUESTIONS_PER_ROUND = 6;
+const QUESTIONS_PER_ROUND = 10;
 const FEEDBACK_DELAY = 1200;
 
 type AnswerDirection = 0 | 1 | 2 | 3 | null;
