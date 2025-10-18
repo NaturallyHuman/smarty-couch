@@ -231,31 +231,31 @@ const Question = () => {
 
   return (
     <>
-      <div className="flex min-h-screen flex-col px-[8vw] py-6">
+      <div className="flex h-full w-full flex-col px-[5%] py-[3%]">
         {/* Top Status Bar - Timer Only */}
-        <div className="mb-12 flex items-center justify-center">
-          <div className="w-full max-w-[60vw]">
+        <div className="mb-[3%] flex items-center justify-center">
+          <div className="w-full max-w-[60%]">
             <TimerBar timeRemaining={timeRemaining} maxTime={QUESTION_TIME} />
           </div>
         </div>
 
         {/* Content Area */}
         <div className="flex flex-1 flex-col items-center justify-center">
-          <div className="w-full max-w-[85vw]">
+          <div className="w-full max-w-[85%]">
             {/* Category */}
-            <h2 className="mb-12 text-center text-2xl text-primary">
+            <h2 className="mb-[3%] text-center text-2xl text-primary">
               {currentQuestion.category}
             </h2>
 
             {/* Question */}
-            <h1 className="mb-16 text-center text-4xl font-bold leading-tight">
+            <h1 className="mb-[4%] text-center text-4xl font-bold leading-tight">
               {currentQuestion.text}
             </h1>
 
             {/* D-pad Answer Layout */}
-            <div className="relative mx-auto h-[50vh] w-full max-w-[80vw]">
+            <div className="relative mx-auto h-[50%] w-full max-w-[80%]">
               {/* Top Answer (Up/A) */}
-              <div className="absolute left-1/2 top-0 w-[30vw] -translate-x-1/2">
+              <div className="absolute left-1/2 top-0 w-[30%] -translate-x-1/2">
                 <AnswerChoice
                   letter="A"
                   text={currentQuestion.choices[0]}
@@ -273,9 +273,9 @@ const Question = () => {
               </div>
 
               {/* Middle Row */}
-              <div className="absolute left-0 top-1/2 flex w-full -translate-y-1/2 items-center justify-center gap-8">
+              <div className="absolute left-0 top-1/2 flex w-full -translate-y-1/2 items-center justify-center gap-[2%]">
                 {/* Left Answer (Left/B) - aligned right */}
-                <div className="w-[30vw] text-right">
+                <div className="w-[30%] text-right">
                   <AnswerChoice
                     letter="B"
                     text={currentQuestion.choices[1]}
@@ -313,7 +313,7 @@ const Question = () => {
                 </div>
 
                 {/* Right Answer (Right/D) - aligned left */}
-                <div className="w-[30vw] text-left">
+                <div className="w-[30%] text-left">
                   <AnswerChoice
                     letter="D"
                     text={currentQuestion.choices[3]}
@@ -332,7 +332,7 @@ const Question = () => {
               </div>
 
               {/* Bottom Answer (Down/C) */}
-              <div className="absolute bottom-0 left-1/2 w-[30vw] -translate-x-1/2">
+              <div className="absolute bottom-0 left-1/2 w-[30%] -translate-x-1/2">
                 <AnswerChoice
                   letter="C"
                   text={currentQuestion.choices[2]}

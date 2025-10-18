@@ -43,8 +43,8 @@ const Stats = () => {
   }, { cat: 'None', data: { correct: 0, total: 0 } });
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-[8vw] py-6">
-      <div className="w-full max-w-[85vw] text-center">
+    <div className="flex h-full w-full flex-col items-center justify-center px-[5%] py-[3%]">
+      <div className="w-full max-w-[90%] text-center">
         <h1 className="mb-4 text-5xl font-bold">Lifetime Stats</h1>
         <p className="mb-12 text-xl text-muted-foreground">Your trivia journey so far</p>
 

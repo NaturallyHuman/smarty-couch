@@ -69,6 +69,12 @@ All colors MUST be HSL.
     @apply text-foreground;
     background: var(--gradient-bg);
     min-height: 100vh;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   /* TV-optimized focus styles */
@@ -78,10 +84,12 @@ All colors MUST be HSL.
     box-shadow: var(--shadow-focus);
   }
 
-  /* TV-specific optimizations for safe viewing area */
-  @media screen and (min-width: 1920px) {
-    body {
-      padding: 3vh 5vw;
-    }
+  /* TV safe area - 90% of viewport with 5% margin on all sides */
+  #root {
+    width: 90vw;
+    height: 90vh;
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow: auto;
   }
 }

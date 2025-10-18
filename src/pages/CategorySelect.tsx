@@ -53,16 +53,16 @@ const CategorySelect = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-[8vw] py-6">
+    <div className="flex h-full w-full flex-col items-center justify-center px-[5%] py-[3%]">
       <button
         onClick={() => navigate('/')}
-        className="absolute left-8 top-8 flex items-center gap-2 text-xl text-muted-foreground transition-colors hover:text-foreground focus:outline-none focus-visible:text-foreground"
+        className="absolute left-[3%] top-[3%] flex items-center gap-2 text-xl text-muted-foreground transition-colors hover:text-foreground focus:outline-none focus-visible:text-foreground"
       >
         <ArrowLeft className="h-6 w-6" />
         Back
       </button>
 
-      <div className="w-full max-w-[80vw] text-center">
+      <div className="w-full max-w-[90%] text-center">
         <h1 className="mb-4 text-4xl font-bold">Choose a Category</h1>
         <p className="mb-12 text-lg text-muted-foreground">
           Select a category or play with all categories

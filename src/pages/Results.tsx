@@ -93,8 +93,8 @@ const Results = () => {
   const percentage = Math.round((correctAnswers / totalQuestions) * 100);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-[8vw] py-6">
-      <div className="w-full max-w-[80vw] text-center">
+    <div className="flex h-full w-full flex-col items-center justify-center px-[5%] py-[3%]">
+      <div className="w-full max-w-[90%] text-center">
         <div className="mb-8">
           <Trophy className="mx-auto mb-4 h-24 w-24 text-primary" />
           <h1 className="mb-2 text-5xl font-bold">Round Complete!</h1>

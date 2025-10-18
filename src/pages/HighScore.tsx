@@ -29,8 +29,8 @@ const HighScore = () => {
   }, [navigate]);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-[8vw] py-6">
-      <div className="w-full max-w-[80vw] text-center">
+    <div className="flex h-full w-full flex-col items-center justify-center px-[5%] py-[3%]">
+      <div className="w-full max-w-[90%] text-center">
         <Sparkles className="mx-auto mb-6 h-20 w-20 text-primary animate-pulse" />
         
         <h1 className="mb-4 text-4xl font-bold">High Score Challenge</h1>

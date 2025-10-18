@@ -39,8 +39,8 @@ const RoundIntro = () => {
   }, [gameState, navigate]);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-[8vw] py-6">
-      <div className="w-full max-w-[80vw] text-center">
+    <div className="flex h-full w-full flex-col items-center justify-center px-[5%] py-[3%]">
+      <div className="w-full max-w-[90%] text-center">
         <h1 className="mb-4 text-5xl font-bold">Get Ready!</h1>
         <p className="mb-4 text-2xl text-primary">{category} Trivia</p>
         {gameState && (
