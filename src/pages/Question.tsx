@@ -231,7 +231,7 @@ const Question = () => {
 
   return (
     <>
-      <div className="flex min-h-screen items-center justify-center bg-background p-[5%]">
+      <div className="flex min-h-screen items-start justify-center bg-background p-[5%]">
         <div className="aspect-video w-full max-w-[1920px]">
           <div className="flex h-full flex-col">
             {/* Timer Bar */}
