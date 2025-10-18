@@ -10,19 +10,16 @@ export const TimerBar = ({ timeRemaining, maxTime }: TimerBarProps) => {
   const isLow = timeRemaining <= 5;
 
   return (
-    <div className="w-full">
-      <div className="mb-2 flex items-center justify-between">
-        <span className="text-xl font-medium text-muted-foreground">Time Remaining</span>
-        <span
-          className={cn('text-3xl font-bold tabular-nums', {
-            'text-destructive animate-pulse': isLow,
-            'text-foreground': !isLow,
-          })}
-        >
-          {timeRemaining}s
-        </span>
-      </div>
-      <div className="h-3 w-full overflow-hidden rounded-full bg-secondary">
+    <div className="flex w-full items-center gap-4">
+      <span
+        className={cn('text-2xl font-bold tabular-nums', {
+          'text-destructive animate-pulse': isLow,
+          'text-foreground': !isLow,
+        })}
+      >
+        {timeRemaining}
+      </span>
+      <div className="h-3 flex-1 overflow-hidden rounded-full bg-secondary">
         <div
           className={cn('h-full transition-all duration-1000 ease-linear', {
             'bg-destructive': isLow,
