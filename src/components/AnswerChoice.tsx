@@ -24,24 +24,26 @@ export const AnswerChoice = ({
     <button
       onClick={onClick}
       className={cn(
-        'relative w-full rounded-xl p-4 text-center transition-all duration-200',
+        'relative w-full rounded-xl p-5 text-center transition-all duration-200',
+        'border-2 border-border/50 bg-card/30 backdrop-blur-sm',
         'focus:outline-none',
-        'text-xl font-semibold leading-tight',
+        'text-lg font-medium leading-tight',
+        'min-h-[80px] flex items-center justify-center',
         {
           // Normal state
-          'bg-card/50 hover:bg-primary/10': !isHighlighted && !isSelected && !showFeedback,
+          'hover:border-primary/50 hover:bg-card/50': !isHighlighted && !isSelected && !showFeedback,
           // Highlighted state (D-pad navigation)
-          'bg-primary/20 shadow-[0_0_20px_hsl(var(--primary)/0.3)]': isHighlighted && !showFeedback,
+          'border-primary bg-primary/20 shadow-[0_0_20px_hsl(var(--primary)/0.3)]': isHighlighted && !showFeedback,
           // Selected state (locked in)
-          'bg-primary/30': isSelected && !showFeedback,
+          'border-primary bg-primary/30': isSelected && !showFeedback,
           // Correct feedback
-          'bg-success/30 animate-pulse': feedbackState === 'correct',
+          'border-success bg-success/30 animate-pulse': feedbackState === 'correct',
           // Incorrect feedback
-          'bg-destructive/30': feedbackState === 'incorrect',
+          'border-destructive bg-destructive/30': feedbackState === 'incorrect',
         }
       )}
     >
-      <span>{text}</span>
+      <span className="block">{text}</span>
     </button>
   );
 };
