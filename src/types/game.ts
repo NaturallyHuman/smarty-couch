@@ -29,6 +29,7 @@ export interface GameState {
   currentRoundCorrect: number;
   currentStreak: number;
   currentMaxStreak: number;
+  usedQuestionIds: string[];
 }
 
 export interface RoundResult {

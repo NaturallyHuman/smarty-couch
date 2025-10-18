@@ -46,7 +46,12 @@ const Question = () => {
     
     const fetchQuestions = async () => {
       try {
-        const selected = await selectQuestions(category, QUESTIONS_PER_ROUND, gameState.currentRound);
+        const selected = await selectQuestions(
+          category, 
+          QUESTIONS_PER_ROUND, 
+          gameState.currentRound,
+          gameState.usedQuestionIds || []
+        );
         setQuestions(selected);
         setScore(gameState.currentRoundScore);
         setStreak(gameState.currentStreak);
@@ -141,6 +146,9 @@ const Question = () => {
       currentPlayer.maxStreak = Math.max(currentPlayer.maxStreak, maxStreak);
       currentPlayer.roundScores.push(score);
 
+      // Add used question IDs to game state
+      const usedIds = [...(gameState.usedQuestionIds || []), ...questions.map(q => q.id)];
+
       const updatedGameState: GameState = {
         ...gameState,
         players: [...gameState.players],
@@ -148,6 +156,7 @@ const Question = () => {
         currentRoundCorrect: 0,
         currentStreak: 0,
         currentMaxStreak: 0,
+        usedQuestionIds: usedIds,
       };
 
       navigate('/results', {

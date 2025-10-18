@@ -38,6 +38,7 @@ const Home = () => {
       currentRoundCorrect: 0,
       currentStreak: 0,
       currentMaxStreak: 0,
+      usedQuestionIds: [],
     };
     navigate('/category', { state: { gameState } });
   };
@@ -71,6 +72,7 @@ const Home = () => {
       currentRoundCorrect: 0,
       currentStreak: 0,
       currentMaxStreak: 0,
+      usedQuestionIds: [],
     };
     navigate('/category', { state: { gameState } });
   };

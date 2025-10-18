@@ -37,12 +37,13 @@ serve(async (req) => {
   }
 
   try {
-    const { category = 'All', amount = 6, round = 1 } = await req.json();
+    const { category = 'All', amount = 10, round = 1, excludeIds = [] } = await req.json();
     
-    console.log('Fetching trivia questions:', { category, amount, round });
+    console.log('Fetching trivia questions:', { category, amount, round, excludedCount: excludeIds.length });
 
-    // Build API URL
-    let apiUrl = `https://opentdb.com/api.php?amount=${amount}`;
+    // Build API URL - fetch extra questions to account for potential duplicates
+    const fetchAmount = Math.min(amount + 10, 50); // Cap at 50 to avoid API limits
+    let apiUrl = `https://opentdb.com/api.php?amount=${fetchAmount}`;
     
     // Add category if not "All"
     if (category !== 'All' && categoryMap[category]) {

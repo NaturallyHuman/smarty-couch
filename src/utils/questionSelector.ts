@@ -1,12 +1,15 @@
 import { Question } from '@/types/game';
 import { supabase } from '@/integrations/supabase/client';
 
-export const selectQuestions = async (category: string, count: number = 6, round: number = 1): Promise<Question[]> => {
+export const selectQuestions = async (category: string, count: number = 10, round: number = 1, excludeIds: string[] = []): Promise<Question[]> => {
   try {
-    console.log('Fetching questions from API:', { category, count, round });
+    console.log('Fetching questions from API:', { category, count, round, excludedCount: excludeIds.length });
+    
+    // Fetch extra questions to account for filtering out duplicates
+    const fetchAmount = count + excludeIds.length + 5;
     
     const { data, error } = await supabase.functions.invoke('fetch-trivia', {
-      body: { category, amount: count, round }
+      body: { category, amount: fetchAmount, round, excludeIds }
     });
 
     if (error) {
@@ -19,8 +22,20 @@ export const selectQuestions = async (category: string, count: number = 6, round
       throw new Error('No questions available');
     }
 
-    console.log(`Successfully fetched ${data.questions.length} questions`);
-    return data.questions as Question[];
+    // Filter out any questions that were already used
+    const filteredQuestions = data.questions.filter(
+      (q: Question) => !excludeIds.includes(q.id)
+    );
+
+    // Take only the number we need
+    const selectedQuestions = filteredQuestions.slice(0, count);
+
+    if (selectedQuestions.length < count) {
+      console.warn(`Only got ${selectedQuestions.length} unique questions, requested ${count}`);
+    }
+
+    console.log(`Successfully fetched ${selectedQuestions.length} unique questions`);
+    return selectedQuestions as Question[];
   } catch (error) {
     console.error('Failed to fetch questions:', error);
     throw error;
