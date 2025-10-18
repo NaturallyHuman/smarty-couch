@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import { TVButton } from '@/components/TVButton';
-import { Trophy, Users, Settings } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { GameState } from '@/types/game';
 
@@ -94,9 +93,8 @@ const Home = () => {
               ref={playButtonRef}
               size="large"
               onClick={() => setShowModeSelect(true)}
-              className="min-w-[280px] gap-3"
+              className="min-w-[280px]"
             >
-              <Trophy className="h-8 w-8" />
               Play
             </TVButton>
 
@@ -104,9 +102,8 @@ const Home = () => {
               size="default"
               variant="secondary"
               disabled
-              className="min-w-[280px] gap-3 opacity-50"
+              className="min-w-[280px] opacity-50"
             >
-              <Settings className="h-6 w-6" />
               Settings
             </TVButton>
           </div>
@@ -116,9 +113,8 @@ const Home = () => {
               ref={soloButtonRef}
               size="large"
               onClick={handlePlaySolo}
-              className="min-w-[280px] gap-3"
+              className="min-w-[280px]"
             >
-              <Trophy className="h-8 w-8" />
               Solo
             </TVButton>
 
@@ -126,9 +122,8 @@ const Home = () => {
               size="large"
               variant="secondary"
               onClick={handlePlayTwoPlayer}
-              className="min-w-[280px] gap-3"
+              className="min-w-[280px]"
             >
-              <Users className="h-8 w-8" />
               Two Players
             </TVButton>
 

@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { TVButton } from '@/components/TVButton';
-import { Clock, TrendingUp, Target } from 'lucide-react';
 import { GameState } from '@/types/game';
 
 const RoundIntro = () => {
@@ -52,19 +51,16 @@ const RoundIntro = () => {
 
         <div className="mb-16 grid gap-8 md:grid-cols-3">
           <div className="rounded-2xl bg-card p-6">
-            <Target className="mx-auto mb-3 h-12 w-12 text-primary" />
             <div className="text-3xl font-bold">6</div>
             <div className="text-lg text-muted-foreground">Questions</div>
           </div>
 
           <div className="rounded-2xl bg-card p-6">
-            <Clock className="mx-auto mb-3 h-12 w-12 text-primary" />
             <div className="text-3xl font-bold">10s</div>
             <div className="text-lg text-muted-foreground">Per Question</div>
           </div>
 
           <div className="rounded-2xl bg-card p-6">
-            <TrendingUp className="mx-auto mb-3 h-12 w-12 text-primary" />
             <div className="text-3xl font-bold">Ramps Up</div>
             <div className="text-lg text-muted-foreground">Difficulty</div>
           </div>
