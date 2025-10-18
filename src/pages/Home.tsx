@@ -119,7 +119,7 @@ const Home = () => {
               className="min-w-[280px] gap-3"
             >
               <Trophy className="h-8 w-8" />
-              Solo (3 Rounds)
+              Solo
             </TVButton>
 
             <TVButton
@@ -129,7 +129,7 @@ const Home = () => {
               className="min-w-[280px] gap-3"
             >
               <Users className="h-8 w-8" />
-              Two Players (4 Rounds)
+              Two Players
             </TVButton>
 
             <TVButton

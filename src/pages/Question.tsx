@@ -42,7 +42,7 @@ const Question = () => {
       navigate('/');
       return;
     }
-    const selected = selectQuestions(category, QUESTIONS_PER_ROUND);
+    const selected = selectQuestions(category, QUESTIONS_PER_ROUND, gameState.currentRound);
     setQuestions(selected);
     setScore(gameState.currentRoundScore);
     setStreak(gameState.currentStreak);
