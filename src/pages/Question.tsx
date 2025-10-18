@@ -219,14 +219,14 @@ const Question = () => {
 
   return (
     <>
-      <div className="flex min-h-screen flex-col items-center justify-center p-8">
-        <div className="w-full max-w-5xl">
+      <div className="flex min-h-screen flex-col items-center justify-center px-[8vw] py-6">
+        <div className="w-full max-w-[80vw]">
           {/* Header */}
-          <div className="mb-8 flex items-center justify-between">
-            <div className="text-xl text-muted-foreground">
+          <div className="mb-4 flex items-center justify-between">
+            <div className="text-lg text-muted-foreground">
               Question {currentIndex + 1} of {questions.length}
             </div>
-            <div className="flex gap-8 text-xl">
+            <div className="flex gap-8 text-lg">
               <div>
                 Score: <span className="font-bold text-primary">{score}</span>
               </div>
@@ -237,20 +237,20 @@ const Question = () => {
           </div>
 
           {/* Timer */}
-          <div className="mb-8">
+          <div className="mb-4">
             <TimerBar timeRemaining={timeRemaining} maxTime={QUESTION_TIME} />
           </div>
 
           {/* Question */}
-          <div className="mb-12 rounded-3xl bg-card p-12 text-center">
-            <h2 className="mb-4 text-2xl text-primary">{currentQuestion.category}</h2>
-            <h1 className="text-5xl font-bold leading-tight">{currentQuestion.text}</h1>
+          <div className="mb-6 rounded-3xl bg-card p-6 text-center">
+            <h2 className="mb-4 text-xl text-primary">{currentQuestion.category}</h2>
+            <h1 className="text-3xl font-bold leading-tight">{currentQuestion.text}</h1>
           </div>
 
           {/* D-pad Answer Layout */}
-          <div className="relative mx-auto mb-12 h-[500px] w-full max-w-4xl">
+          <div className="relative mx-auto mb-4 h-[45vh] w-full max-w-[75vw]">
             {/* Top Answer (Up/A) */}
-            <div className="absolute left-1/2 top-0 w-[380px] -translate-x-1/2">
+            <div className="absolute left-1/2 top-0 w-[28vw] -translate-x-1/2">
               <AnswerChoice
                 letter="A"
                 text={currentQuestion.choices[0]}
@@ -270,7 +270,7 @@ const Question = () => {
             {/* Middle Row */}
             <div className="absolute left-0 top-1/2 flex w-full -translate-y-1/2 items-center justify-between">
               {/* Left Answer (Left/B) */}
-              <div className="w-[380px]">
+              <div className="w-[28vw]">
                 <AnswerChoice
                   letter="B"
                   text={currentQuestion.choices[1]}
@@ -288,7 +288,7 @@ const Question = () => {
               </div>
 
               {/* Right Answer (Right/D) */}
-              <div className="w-[380px]">
+              <div className="w-[28vw]">
                 <AnswerChoice
                   letter="D"
                   text={currentQuestion.choices[3]}
@@ -307,7 +307,7 @@ const Question = () => {
             </div>
 
             {/* Bottom Answer (Down/C) */}
-            <div className="absolute bottom-0 left-1/2 w-[380px] -translate-x-1/2">
+            <div className="absolute bottom-0 left-1/2 w-[28vw] -translate-x-1/2">
               <AnswerChoice
                 letter="C"
                 text={currentQuestion.choices[2]}

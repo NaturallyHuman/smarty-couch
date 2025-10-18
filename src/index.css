@@ -77,4 +77,11 @@ All colors MUST be HSL.
     outline: none;
     box-shadow: var(--shadow-focus);
   }
+
+  /* TV-specific optimizations for safe viewing area */
+  @media screen and (min-width: 1920px) {
+    body {
+      padding: 3vh 5vw;
+    }
+  }
 }

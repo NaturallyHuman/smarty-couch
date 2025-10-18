@@ -24,9 +24,9 @@ export const AnswerChoice = ({
     <button
       onClick={onClick}
       className={cn(
-        'relative w-full rounded-xl p-6 text-left transition-all duration-200',
+        'relative w-full rounded-xl p-4 text-left transition-all duration-200',
         'border-2 focus:outline-none',
-        'text-[2rem] font-medium leading-tight',
+        'text-xl font-medium leading-tight',
         {
           // Normal state
           'border-border bg-card hover:border-primary/50': !isHighlighted && !isSelected && !showFeedback,
@@ -44,7 +44,7 @@ export const AnswerChoice = ({
       <div className="flex items-center gap-4">
         <div
           className={cn(
-            'flex h-12 w-12 shrink-0 items-center justify-center rounded-lg text-2xl font-bold transition-colors',
+            'flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-xl font-bold transition-colors',
             {
               'bg-primary/20 text-primary': isHighlighted || isSelected,
               'bg-muted text-muted-foreground': !isHighlighted && !isSelected && !showFeedback,
