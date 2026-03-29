@@ -35,8 +35,8 @@ const Question = () => {
   const [showPauseDialog, setShowPauseDialog] = useState(false);
   const [streakBonus, setStreakBonus] = useState(0);
 
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const feedbackTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const feedbackTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const musicRef = useRef<HTMLAudioElement | null>(null);
   const correctSoundRef = useRef<HTMLAudioElement | null>(null);
   const incorrectSoundRef = useRef<HTMLAudioElement | null>(null);
