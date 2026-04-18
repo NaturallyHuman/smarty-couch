@@ -61,13 +61,12 @@ const Question = () => {
         setMaxStreak(gameState.currentMaxStreak);
         setCorrectCount(gameState.currentRoundCorrect);
         
-        // Initialize audio when questions are ready
-        if (!musicRef.current) {
-          const music = new Audio('/question-music.mp3');
-          music.loop = true;
-          musicRef.current = music;
-          fadeIn(music, 0.35, 800);
-        }
+        // Crossfade intro music into the question loop — seamless handoff.
+        audioManager.crossfade('intro', 'question', '/question-music.mp3', {
+          volume: 0.35,
+          loop: true,
+          durationMs: 1200,
+        });
         
         if (!correctSoundRef.current) {
           correctSoundRef.current = new Audio('/correct.mp3');
