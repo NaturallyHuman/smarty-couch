@@ -8,7 +8,7 @@ import { Question as QuestionType, GameState } from '@/types/game';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { TVButton } from '@/components/TVButton';
 import { Flame, ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react';
-import { fadeIn, fadeOut } from '@/utils/audioFade';
+import { audioManager } from '@/utils/audioManager';
 
 const QUESTION_TIME = 10;
 const QUESTIONS_PER_ROUND = 10;
@@ -38,7 +38,6 @@ const Question = () => {
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const feedbackTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const musicRef = useRef<HTMLAudioElement | null>(null);
   const correctSoundRef = useRef<HTMLAudioElement | null>(null);
   const incorrectSoundRef = useRef<HTMLAudioElement | null>(null);
 
@@ -62,13 +61,12 @@ const Question = () => {
         setMaxStreak(gameState.currentMaxStreak);
         setCorrectCount(gameState.currentRoundCorrect);
         
-        // Initialize audio when questions are ready
-        if (!musicRef.current) {
-          const music = new Audio('/question-music.mp3');
-          music.loop = true;
-          musicRef.current = music;
-          fadeIn(music, 0.35, 800);
-        }
+        // Crossfade intro music into the question loop — seamless handoff.
+        audioManager.crossfade('intro', 'question', '/question-music.mp3', {
+          volume: 0.35,
+          loop: true,
+          durationMs: 1200,
+        });
         
         if (!correctSoundRef.current) {
           correctSoundRef.current = new Audio('/correct.mp3');
@@ -182,12 +180,8 @@ const Question = () => {
     if (currentIndex >= questions.length - 1) {
       if (!gameState) return;
 
-      // Fade out music before navigating away
-      if (musicRef.current) {
-        const music = musicRef.current;
-        musicRef.current = null;
-        fadeOut(music, 600);
-      }
+      // Fade out question music before navigating away
+      audioManager.stopTrack('question', 600);
 
       const currentPlayer = gameState.players[gameState.currentPlayer];
       currentPlayer.totalScore += score;
@@ -272,8 +266,8 @@ const Question = () => {
 
   // Pause/resume music with pause dialog
   useEffect(() => {
-    if (musicRef.current && showPauseDialog) {
-      fadeOut(musicRef.current, 300);
+    if (showPauseDialog) {
+      audioManager.setTrackVolume('question', 0, 300);
     }
   }, [showPauseDialog]);
 
@@ -281,11 +275,6 @@ const Question = () => {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
       if (feedbackTimeoutRef.current) clearTimeout(feedbackTimeoutRef.current);
-      if (musicRef.current) {
-        const music = musicRef.current;
-        musicRef.current = null;
-        fadeOut(music, 400);
-      }
       if (correctSoundRef.current) {
         correctSoundRef.current = null;
       }
@@ -303,18 +292,12 @@ const Question = () => {
     setFeedbackState(null);
 
     // Resume background music with fade-in
-    if (musicRef.current) {
-      fadeIn(musicRef.current, 0.35, 500);
-    }
+    audioManager.setTrackVolume('question', 0.35, 500);
   };
 
   const handleQuit = () => {
     // Fade out music before quitting
-    if (musicRef.current) {
-      const music = musicRef.current;
-      musicRef.current = null;
-      fadeOut(music, 500);
-    }
+    audioManager.stopTrack('question', 500);
     navigate('/');
   };
 

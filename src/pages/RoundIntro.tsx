@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { GameState } from '@/types/game';
-import { fadeIn, fadeOut } from '@/utils/audioFade';
+import { audioManager } from '@/utils/audioManager';
 
 const DURATION_MS = 5000;
 
@@ -38,7 +38,6 @@ const RoundIntro = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const gameState = location.state?.gameState as GameState;
-  const introAudioRef = useRef<HTMLAudioElement | null>(null);
 
   const message = useMemo(() => {
     const isFirstRound = !gameState || gameState.currentRound === 1;
@@ -46,17 +45,9 @@ const RoundIntro = () => {
   }, [gameState]);
 
   useEffect(() => {
-    const audio = new Audio('/round-start.mp3');
-    introAudioRef.current = audio;
-    fadeIn(audio, 0.5, 700);
-
-    return () => {
-      const current = introAudioRef.current;
-      introAudioRef.current = null;
-      if (current) {
-        fadeOut(current, 600);
-      }
-    };
+    audioManager.playTrack('intro', '/round-start.mp3', { volume: 0.5, durationMs: 700 });
+    // Intentionally do NOT stop the intro track on unmount — Question.tsx
+    // will crossfade it out into the question loop for a seamless handoff.
   }, []);
 
   const handleStart = () => {
