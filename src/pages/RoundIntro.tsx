@@ -1,18 +1,17 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { TVButton } from '@/components/TVButton';
 import { GameState } from '@/types/game';
+
+const COUNTDOWN = 3;
 
 const RoundIntro = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const gameState = location.state?.gameState as GameState;
-  const buttonRef = useRef<HTMLButtonElement>(null);
   const introAudioRef = useRef<HTMLAudioElement | null>(null);
+  const [secondsLeft, setSecondsLeft] = useState(COUNTDOWN);
 
   useEffect(() => {
-    buttonRef.current?.focus();
-
     introAudioRef.current = new Audio('/round-start.mp3');
     introAudioRef.current.volume = 0.5;
     introAudioRef.current.play().catch(error => {
@@ -36,6 +35,21 @@ const RoundIntro = () => {
   };
 
   useEffect(() => {
+    const interval = setInterval(() => {
+      setSecondsLeft((s) => {
+        if (s <= 1) {
+          clearInterval(interval);
+          handleStart();
+          return 0;
+        }
+        return s - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Enter') {
         e.preventDefault();
@@ -48,6 +62,7 @@ const RoundIntro = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameState, navigate]);
 
   return (
@@ -62,14 +77,9 @@ const RoundIntro = () => {
           </p>
         )}
 
-        <TVButton
-          ref={buttonRef}
-          size="large"
-          onClick={handleStart}
-          className="min-w-[300px]"
-        >
-          Start Round
-        </TVButton>
+        <div className="text-7xl font-bold text-primary tabular-nums">
+          {secondsLeft}
+        </div>
       </div>
     </div>
   );
