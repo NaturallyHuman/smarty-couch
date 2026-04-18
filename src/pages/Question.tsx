@@ -388,17 +388,17 @@ const Question = () => {
               {/* Center D-pad Visual */}
               <div className="flex h-32 w-32 shrink-0 items-center justify-center">
                 <div className="relative h-full w-full opacity-30">
-                  <div className="absolute left-1/2 top-0 h-10 w-10 -translate-x-1/2 rounded-t-lg border-2 border-foreground/50 bg-background/20 flex items-center justify-center">
-                    <ArrowUp className="h-5 w-5" />
+                  <div className="absolute left-1/2 top-0 grid h-10 w-10 -translate-x-1/2 place-items-center rounded-t-lg border-2 border-foreground/50 bg-background/20">
+                    <ArrowUp className="h-5 w-5 shrink-0" />
                   </div>
-                  <div className="absolute left-0 top-1/2 h-10 w-10 -translate-y-1/2 rounded-l-lg border-2 border-foreground/50 bg-background/20 flex items-center justify-center">
-                    <ArrowLeft className="h-5 w-5" />
+                  <div className="absolute left-0 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-l-lg border-2 border-foreground/50 bg-background/20">
+                    <ArrowLeft className="h-5 w-5 shrink-0" />
                   </div>
-                  <div className="absolute right-0 top-1/2 h-10 w-10 -translate-y-1/2 rounded-r-lg border-2 border-foreground/50 bg-background/20 flex items-center justify-center">
-                    <ArrowRight className="h-5 w-5" />
+                  <div className="absolute right-0 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-r-lg border-2 border-foreground/50 bg-background/20">
+                    <ArrowRight className="h-5 w-5 shrink-0" />
                   </div>
-                  <div className="absolute bottom-0 left-1/2 h-10 w-10 -translate-x-1/2 rounded-b-lg border-2 border-foreground/50 bg-background/20 flex items-center justify-center">
-                    <ArrowDown className="h-5 w-5" />
+                  <div className="absolute bottom-0 left-1/2 grid h-10 w-10 -translate-x-1/2 place-items-center rounded-b-lg border-2 border-foreground/50 bg-background/20">
+                    <ArrowDown className="h-5 w-5 shrink-0" />
                   </div>
                   <div className="absolute left-1/2 top-1/2 h-6 w-6 -translate-x-1/2 -translate-y-1/2 rounded-full bg-background/30" />
                 </div>
