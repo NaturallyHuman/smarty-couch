@@ -1,60 +1,31 @@
 
-## Plan: TV-First Polish, Mixed Categories, Transition Cards & Slim Game Over
+Three issues to address:
 
-### 1. Lock TV aspect ratio (always 16:9, no scrolling)
-- `src/index.css`: keep the `#root` 16:9 letterbox sizing but remove `overflow: auto` so content never scrolls — TVs can't scroll. Use `overflow: hidden`.
-- `src/pages/Question.tsx`: replace its own `min-h-screen` + `aspect-video` wrapper with the same `h-full w-full` pattern other pages use, so it inherits the global 16:9 stage instead of fighting it.
-- All page content already uses `px-[5%] py-[3%]` safe-area — keep that, but cap font sizes so they fit at 720p without wrapping awkwardly.
+### 1. Audio not playing
+Likely causes:
+- `/question-music.mp3`, `/correct.mp3`, `/incorrect.mp3` files may not exist in `/public`
+- Audio init lives inside `fetchQuestions` — only runs once, but autoplay can be blocked before user interaction
 
-### 2. Clean answer choices (no borders/backgrounds, no overlap with D-pad)
-- `src/components/AnswerChoice.tsx`: strip the border, background, backdrop-blur, and padding box. Render as plain large text. Keep state styling via **text color + subtle glow only**:
-  - default: `text-foreground`
-  - highlighted/selected: `text-primary` with soft text-shadow glow
-  - correct: `text-success`
-  - incorrect: `text-destructive` with strikethrough
-- Remove `min-h-[80px]` box; let it size to text.
-- `src/pages/Question.tsx`: widen the D-pad layout so the four answers sit clearly at top / left / right / bottom of the central D-pad icon with comfortable spacing, and shrink answer width so they no longer visually collide with the arrow icons. The arrows stay as the only visual "frame."
+Fix: Verify files exist (will check during implementation). Move audio init to a separate effect that triggers on first user keypress/click as a fallback for autoplay policies. Also ensure music starts on Home/RoundIntro (post-user-interaction) so it's already "unlocked" by the time Question loads.
 
-### 3. Replace round-end button with a 5-second randomized transition card
-- New page: `src/pages/RoundTransition.tsx`
-  - Shows for 5 seconds, then auto-navigates to the next `/round-intro` (or `/turn-transition` for two-player, or `/game-over` if last round).
-  - Picks one random message from a pool, e.g.:
-    - "Not bad… but it's about to get harder. Think you can keep up?"
-    - "Nice warm-up. The real challenge starts now."
-    - "You're doing great — let's crank up the difficulty."
-    - "Easy round done. Brace yourself."
-    - "Solid! But the next round won't go easy on you."
-    - "Hope you were just warming up. It's getting tougher."
-  - Big centered text, subtle countdown ring or fading dots, no buttons. Pressing Enter can skip early (TV-friendly).
-- `src/App.tsx`: register `/round-transition` route.
-- `src/pages/Question.tsx` `moveToNext()`: instead of going to `/results`, go to `/round-transition` carrying the same payload (score, gameState, etc.).
-- Skip the transition (go straight to game-over) if the round just finished is the last round.
+### 2. Move answers closer to arrows (~32px gap)
+In `src/pages/Question.tsx` the D-pad layout currently positions answers at the outer edges with large gaps. Tighten:
+- Top answer (A): position just above the up-arrow with ~32px gap
+- Bottom answer (C): just below down-arrow with ~32px gap
+- Left answer (B): just left of left-arrow with ~32px gap
+- Right answer (D): just right of right-arrow with ~32px gap
 
-### 4. Force mixed categories every round
-- DB already has **20 questions × 5 categories × 3 difficulties = 300**. No new questions needed unless user wants more.
-- Remove the category-selection step from the flow:
-  - `src/pages/Home.tsx`: after choosing Solo / Two Players, navigate **straight to `/round-intro`** with `category = 'Mixed'` (skip `/category`).
-  - Keep `CategorySelect.tsx` file but unroute it (or just stop navigating to it). Simpler: delete the `/category` route from `App.tsx`.
-- `src/utils/questionSelector.ts`: treat `'Mixed'` (and existing `'All'`) the same — no category filter, pull from all 5 categories. Existing shuffle already randomizes order across categories.
-- `RoundIntro.tsx`: show "Mixed Trivia" instead of category name.
+Switch from `absolute` corner positioning to a layout anchored around the central D-pad, using fixed `gap` spacing of `32px` (e.g. `mr-8`/`ml-8`/`mb-8`/`mt-8`). Answer text widths shrink to fit naturally.
 
-### 5. Slim down Game Over screen
-- `src/pages/GameOver.tsx`: replace the entire stat/badge/rank block with a minimal layout:
-  - Title: "Game Over"
-  - Big number: final score (for two-player, show both players' scores side by side, just name + score)
-  - Single button: **Play Again** → navigates to `/` (or directly starts a new game with same mode)
-  - Remove: Trophy icon block, Award/Zap stats, percentage, badges, rank, "View Stats" button, "Home" button.
+### 3. TimerBar should snap full on new question
+In `src/components/TimerBar.tsx`, the bar uses `transition-all duration-1000 ease-linear`. When a new question loads and `timeRemaining` jumps from 0 → 10, it animates backward visibly.
 
-### 6. Files touched
-- Edit: `src/index.css`, `src/components/AnswerChoice.tsx`, `src/pages/Question.tsx`, `src/pages/Home.tsx`, `src/pages/RoundIntro.tsx`, `src/pages/Results.tsx` (becomes unused or thin pass-through — will remove its route usage), `src/pages/GameOver.tsx`, `src/App.tsx`, `src/utils/questionSelector.ts`
-- Create: `src/pages/RoundTransition.tsx`
-- No DB changes (300 questions across 5 categories already seeded)
+Fix: Disable the transition when the bar is filling up (going from low to high), only animate when draining. Simplest: add a `key` reset or detect direction. Cleanest: have `Question.tsx` pass a `questionIndex` as `key` to `TimerBar`, forcing a remount per question so the fill state initializes instantly without transition. Alternatively, conditionally apply the transition class only when `percentage < previous percentage`.
 
-### 7. Flow after changes
-```text
-Home → (Solo/2P) → RoundIntro (Mixed) → Question x10
-   → RoundTransition (5s, randomized message)
-   → RoundIntro (next round) → Question x10
-   → RoundTransition → ...
-   → GameOver (score + Play Again)
-```
+### Files to edit
+- `src/pages/Question.tsx` — tighten D-pad spacing (~32px), add `key={currentIndex}` to `TimerBar`, optionally add user-interaction audio unlock
+- `src/components/TimerBar.tsx` — ensure first render shows full bar with no animation (mount = instant fill via initial style)
+- `public/` — verify audio files exist; if missing, add fallback handling and surface an error
+
+### Audio investigation step
+Before implementing, confirm whether `/public/question-music.mp3`, `/public/correct.mp3`, `/public/incorrect.mp3` exist. If they don't, we need to either generate them or update paths. Will check `public/` directory first thing in implementation.
