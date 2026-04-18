@@ -8,7 +8,7 @@ import { Question as QuestionType, GameState } from '@/types/game';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { TVButton } from '@/components/TVButton';
 import { Flame, ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react';
-import { fadeIn, fadeOut } from '@/utils/audioFade';
+import { audioManager } from '@/utils/audioManager';
 
 const QUESTION_TIME = 10;
 const QUESTIONS_PER_ROUND = 10;
