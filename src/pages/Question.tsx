@@ -346,11 +346,19 @@ const Question = () => {
           {currentQuestion.text}
         </h1>
 
-        {/* D-pad Answer Layout — answers sit 32px from each corresponding arrow */}
+        {/* D-pad Answer Layout — d-pad is the fixed anchor; answer slots are fixed width so they never shift it */}
         <div className="flex flex-1 items-center justify-center">
-          <div className="flex flex-col items-center">
-            {/* Top Answer (A / Up) */}
-            <div className="mb-8 max-w-[420px] text-center">
+          <div
+            className="grid items-center justify-items-center"
+            style={{
+              gridTemplateColumns: '360px 128px 360px',
+              gridTemplateRows: 'auto 128px auto',
+              columnGap: '32px',
+              rowGap: '32px',
+            }}
+          >
+            {/* Top Answer (A / Up) — spans all 3 columns, centered above d-pad */}
+            <div className="col-span-3 w-[420px] text-center">
               <AnswerChoice
                 letter="A"
                 text={currentQuestion.choices[0]}
@@ -367,66 +375,63 @@ const Question = () => {
               />
             </div>
 
-            {/* Middle Row: Left answer — D-pad — Right answer */}
-            <div className="flex items-center">
-              {/* Left Answer (B / Left) */}
-              <div className="mr-8 max-w-[360px] text-right">
-                <AnswerChoice
-                  letter="B"
-                  text={currentQuestion.choices[1]}
-                  isSelected={selectedAnswer === 1}
-                  isHighlighted={highlightedAnswer === 1}
-                  feedbackState={
-                    feedbackState && selectedAnswer === 1
-                      ? feedbackState
-                      : feedbackState && 1 === currentQuestion.correctIndex
-                      ? 'correct'
-                      : null
-                  }
-                  onClick={() => handleAnswer(1 as AnswerDirection)}
-                />
-              </div>
+            {/* Left Answer (B / Left) */}
+            <div className="w-[360px] text-right">
+              <AnswerChoice
+                letter="B"
+                text={currentQuestion.choices[1]}
+                isSelected={selectedAnswer === 1}
+                isHighlighted={highlightedAnswer === 1}
+                feedbackState={
+                  feedbackState && selectedAnswer === 1
+                    ? feedbackState
+                    : feedbackState && 1 === currentQuestion.correctIndex
+                    ? 'correct'
+                    : null
+                }
+                onClick={() => handleAnswer(1 as AnswerDirection)}
+              />
+            </div>
 
-              {/* Center D-pad Visual */}
-              <div className="flex h-32 w-32 shrink-0 items-center justify-center">
-                <div className="relative h-full w-full opacity-30">
-                  <div className="absolute left-1/2 top-0 grid h-10 w-10 -translate-x-1/2 place-items-center rounded-t-lg border-2 border-foreground/50 bg-background/20">
-                    <ArrowUp className="h-5 w-5 shrink-0" />
-                  </div>
-                  <div className="absolute left-0 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-l-lg border-2 border-foreground/50 bg-background/20">
-                    <ArrowLeft className="h-5 w-5 shrink-0" />
-                  </div>
-                  <div className="absolute right-0 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-r-lg border-2 border-foreground/50 bg-background/20">
-                    <ArrowRight className="h-5 w-5 shrink-0" />
-                  </div>
-                  <div className="absolute bottom-0 left-1/2 grid h-10 w-10 -translate-x-1/2 place-items-center rounded-b-lg border-2 border-foreground/50 bg-background/20">
-                    <ArrowDown className="h-5 w-5 shrink-0" />
-                  </div>
-                  <div className="absolute left-1/2 top-1/2 h-6 w-6 -translate-x-1/2 -translate-y-1/2 rounded-full bg-background/30" />
+            {/* Center D-pad Visual — the page anchor */}
+            <div className="flex h-32 w-32 shrink-0 items-center justify-center">
+              <div className="relative h-full w-full opacity-30">
+                <div className="absolute left-1/2 top-0 grid h-10 w-10 -translate-x-1/2 place-items-center rounded-t-lg border-2 border-foreground/50 bg-background/20">
+                  <ArrowUp className="h-5 w-5 shrink-0" />
                 </div>
-              </div>
-
-              {/* Right Answer (D / Right) */}
-              <div className="ml-8 max-w-[360px] text-left">
-                <AnswerChoice
-                  letter="D"
-                  text={currentQuestion.choices[3]}
-                  isSelected={selectedAnswer === 3}
-                  isHighlighted={highlightedAnswer === 3}
-                  feedbackState={
-                    feedbackState && selectedAnswer === 3
-                      ? feedbackState
-                      : feedbackState && 3 === currentQuestion.correctIndex
-                      ? 'correct'
-                      : null
-                  }
-                  onClick={() => handleAnswer(3 as AnswerDirection)}
-                />
+                <div className="absolute left-0 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-l-lg border-2 border-foreground/50 bg-background/20">
+                  <ArrowLeft className="h-5 w-5 shrink-0" />
+                </div>
+                <div className="absolute right-0 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-r-lg border-2 border-foreground/50 bg-background/20">
+                  <ArrowRight className="h-5 w-5 shrink-0" />
+                </div>
+                <div className="absolute bottom-0 left-1/2 grid h-10 w-10 -translate-x-1/2 place-items-center rounded-b-lg border-2 border-foreground/50 bg-background/20">
+                  <ArrowDown className="h-5 w-5 shrink-0" />
+                </div>
+                <div className="absolute left-1/2 top-1/2 h-6 w-6 -translate-x-1/2 -translate-y-1/2 rounded-full bg-background/30" />
               </div>
             </div>
 
-            {/* Bottom Answer (C / Down) */}
-            <div className="mt-8 max-w-[420px] text-center">
+            {/* Right Answer (D / Right) */}
+            <div className="w-[360px] text-left">
+              <AnswerChoice
+                letter="D"
+                text={currentQuestion.choices[3]}
+                isSelected={selectedAnswer === 3}
+                isHighlighted={highlightedAnswer === 3}
+                feedbackState={
+                  feedbackState && selectedAnswer === 3
+                    ? feedbackState
+                    : feedbackState && 3 === currentQuestion.correctIndex
+                    ? 'correct'
+                    : null
+                }
+                onClick={() => handleAnswer(3 as AnswerDirection)}
+              />
+            </div>
+
+            {/* Bottom Answer (C / Down) — spans all 3 columns, centered below d-pad */}
+            <div className="col-span-3 w-[420px] text-center">
               <AnswerChoice
                 letter="C"
                 text={currentQuestion.choices[2]}
