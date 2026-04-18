@@ -180,12 +180,8 @@ const Question = () => {
     if (currentIndex >= questions.length - 1) {
       if (!gameState) return;
 
-      // Fade out music before navigating away
-      if (musicRef.current) {
-        const music = musicRef.current;
-        musicRef.current = null;
-        fadeOut(music, 600);
-      }
+      // Fade out question music before navigating away
+      audioManager.stopTrack('question', 600);
 
       const currentPlayer = gameState.players[gameState.currentPlayer];
       currentPlayer.totalScore += score;
