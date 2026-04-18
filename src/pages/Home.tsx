@@ -22,7 +22,7 @@ const Home = () => {
   const handlePlaySolo = () => {
     const gameState: GameState = {
       mode: 'solo',
-      category: '',
+      category: 'Mixed',
       currentRound: 1,
       totalRounds: 3,
       currentPlayer: 0,
@@ -34,9 +34,6 @@ const Home = () => {
         maxStreak: 0,
         roundScores: [],
       }],
-    };
-    gameState.category = 'Mixed';
-    const _ = gameState; // no-op
       currentRoundScore: 0,
       currentRoundCorrect: 0,
       currentStreak: 0,
