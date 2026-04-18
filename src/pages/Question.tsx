@@ -225,8 +225,10 @@ const Question = () => {
 
       if (isGameOver) {
         navigate('/game-over', { state: { gameState: updatedGameState } });
+      } else if (updatedGameState.mode === 'two-player') {
+        navigate('/turn-transition', { state: { gameState: updatedGameState } });
       } else {
-        navigate('/round-transition', { state: { gameState: updatedGameState } });
+        navigate('/round-intro', { state: { gameState: updatedGameState } });
       }
     } else {
       setCurrentIndex((prev) => prev + 1);
