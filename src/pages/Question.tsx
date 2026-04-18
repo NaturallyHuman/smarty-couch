@@ -182,13 +182,13 @@ const Question = () => {
   const moveToNext = () => {
     if (currentIndex >= questions.length - 1) {
       if (!gameState) return;
-      
-      // Stop music before navigating to results
+
+      // Stop music before navigating away
       if (musicRef.current) {
         musicRef.current.pause();
         musicRef.current = null;
       }
-      
+
       const currentPlayer = gameState.players[gameState.currentPlayer];
       currentPlayer.totalScore += score;
       currentPlayer.correctAnswers += correctCount;
@@ -196,12 +196,24 @@ const Question = () => {
       currentPlayer.maxStreak = Math.max(currentPlayer.maxStreak, maxStreak);
       currentPlayer.roundScores.push(score);
 
-      // Add used question IDs to game state
       const usedIds = [...(gameState.usedQuestionIds || []), ...questions.map(q => q.id)];
+
+      // Determine next round / player
+      let nextPlayer = gameState.currentPlayer;
+      let nextRound = gameState.currentRound;
+
+      if (gameState.mode === 'two-player') {
+        nextPlayer = (gameState.currentPlayer + 1) % gameState.players.length;
+        if (nextPlayer === 0) nextRound++;
+      } else {
+        nextRound++;
+      }
 
       const updatedGameState: GameState = {
         ...gameState,
         players: [...gameState.players],
+        currentRound: nextRound,
+        currentPlayer: nextPlayer,
         currentRoundScore: 0,
         currentRoundCorrect: 0,
         currentStreak: 0,
@@ -209,18 +221,13 @@ const Question = () => {
         usedQuestionIds: usedIds,
       };
 
-      navigate('/results', {
-        state: {
-          correctAnswers: correctCount,
-          totalQuestions: questions.length,
-          score: score,
-          maxStreak,
-          streakBonus,
-          category,
-          correctByCategory,
-          gameState: updatedGameState,
-        },
-      });
+      const isGameOver = nextRound > gameState.totalRounds;
+
+      if (isGameOver) {
+        navigate('/game-over', { state: { gameState: updatedGameState } });
+      } else {
+        navigate('/round-transition', { state: { gameState: updatedGameState } });
+      }
     } else {
       setCurrentIndex((prev) => prev + 1);
       setHighlightedAnswer(null);
@@ -313,7 +320,7 @@ const Question = () => {
 
   if (!currentQuestion) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex h-full w-full items-center justify-center">
         <div className="text-2xl">Loading questions...</div>
       </div>
     );
@@ -321,121 +328,116 @@ const Question = () => {
 
   return (
     <>
-      <div className="flex min-h-screen items-start justify-center bg-background p-[5%]">
-        <div className="aspect-video w-full max-w-[1920px]">
-          <div className="flex h-full flex-col">
-            {/* Timer Bar */}
-            <div className="mb-8">
-              <TimerBar timeRemaining={timeRemaining} maxTime={QUESTION_TIME} />
+      <div className="flex h-full w-full flex-col px-[5%] py-[3%]">
+        {/* Timer Bar */}
+        <div className="mb-4">
+          <TimerBar timeRemaining={timeRemaining} maxTime={QUESTION_TIME} />
+        </div>
+
+        {/* Category */}
+        <h2 className="mb-2 text-center text-base text-primary">
+          {currentQuestion.category}
+        </h2>
+
+        {/* Question */}
+        <h1 className="mb-6 text-center text-2xl font-semibold leading-tight px-8">
+          {currentQuestion.text}
+        </h1>
+
+        {/* D-pad Answer Layout */}
+        <div className="relative mx-auto w-full max-w-[1100px] flex-1">
+          {/* Top Answer (Up/A) */}
+          <div className="absolute left-1/2 top-0 w-[26%] -translate-x-1/2">
+            <AnswerChoice
+              letter="A"
+              text={currentQuestion.choices[0]}
+              isSelected={selectedAnswer === 0}
+              isHighlighted={highlightedAnswer === 0}
+              feedbackState={
+                feedbackState && selectedAnswer === 0
+                  ? feedbackState
+                  : feedbackState && 0 === currentQuestion.correctIndex
+                  ? 'correct'
+                  : null
+              }
+              onClick={() => handleAnswer(0 as AnswerDirection)}
+            />
+          </div>
+
+          {/* Middle Row */}
+          <div className="absolute left-0 top-1/2 flex w-full -translate-y-1/2 items-center justify-between">
+            {/* Left Answer (Left/B) */}
+            <div className="w-[28%] pr-6 text-right">
+              <AnswerChoice
+                letter="B"
+                text={currentQuestion.choices[1]}
+                isSelected={selectedAnswer === 1}
+                isHighlighted={highlightedAnswer === 1}
+                feedbackState={
+                  feedbackState && selectedAnswer === 1
+                    ? feedbackState
+                    : feedbackState && 1 === currentQuestion.correctIndex
+                    ? 'correct'
+                    : null
+                }
+                onClick={() => handleAnswer(1 as AnswerDirection)}
+              />
             </div>
 
-            {/* Category */}
-            <h2 className="mb-6 text-center text-xl text-primary">
-              {currentQuestion.category}
-            </h2>
-
-            {/* Question */}
-            <h1 className="mb-12 text-center text-2xl font-semibold leading-tight px-8">
-              {currentQuestion.text}
-            </h1>
-
-            {/* D-pad Answer Layout */}
-            <div className="relative mx-auto h-[450px] w-full max-w-[900px] flex-1">
-              {/* Top Answer (Up/A) */}
-              <div className="absolute left-1/2 top-0 w-[40%] -translate-x-1/2">
-                <AnswerChoice
-                  letter="A"
-                  text={currentQuestion.choices[0]}
-                  isSelected={selectedAnswer === 0}
-                  isHighlighted={highlightedAnswer === 0}
-                  feedbackState={
-                    feedbackState && selectedAnswer === 0
-                      ? feedbackState
-                      : feedbackState && 0 === currentQuestion.correctIndex
-                      ? 'correct'
-                      : null
-                  }
-                  onClick={() => handleAnswer(0 as AnswerDirection)}
-                />
-              </div>
-
-              {/* Middle Row */}
-              <div className="absolute left-0 top-1/2 flex w-full -translate-y-1/2 items-center justify-between">
-                {/* Left Answer (Left/B) */}
-                <div className="w-[38%]">
-                  <AnswerChoice
-                    letter="B"
-                    text={currentQuestion.choices[1]}
-                    isSelected={selectedAnswer === 1}
-                    isHighlighted={highlightedAnswer === 1}
-                    feedbackState={
-                      feedbackState && selectedAnswer === 1
-                        ? feedbackState
-                        : feedbackState && 1 === currentQuestion.correctIndex
-                        ? 'correct'
-                        : null
-                    }
-                    onClick={() => handleAnswer(1 as AnswerDirection)}
-                  />
+            {/* Center D-pad Visual */}
+            <div className="flex h-32 w-32 shrink-0 items-center justify-center">
+              <div className="relative h-full w-full opacity-30">
+                <div className="absolute left-1/2 top-0 h-10 w-10 -translate-x-1/2 rounded-t-lg border-2 border-foreground/50 bg-background/20 flex items-center justify-center">
+                  <ArrowUp className="h-5 w-5" />
                 </div>
-
-                {/* Center D-pad Visual */}
-                <div className="flex h-32 w-32 shrink-0 items-center justify-center">
-                  <div className="relative h-full w-full opacity-30">
-                    {/* D-pad shape */}
-                    <div className="absolute left-1/2 top-0 h-10 w-10 -translate-x-1/2 rounded-t-lg border-2 border-foreground/50 bg-background/20 flex items-center justify-center">
-                      <ArrowUp className="h-5 w-5" />
-                    </div>
-                    <div className="absolute left-0 top-1/2 h-10 w-10 -translate-y-1/2 rounded-l-lg border-2 border-foreground/50 bg-background/20 flex items-center justify-center">
-                      <ArrowLeft className="h-5 w-5" />
-                    </div>
-                    <div className="absolute right-0 top-1/2 h-10 w-10 -translate-y-1/2 rounded-r-lg border-2 border-foreground/50 bg-background/20 flex items-center justify-center">
-                      <ArrowRight className="h-5 w-5" />
-                    </div>
-                    <div className="absolute bottom-0 left-1/2 h-10 w-10 -translate-x-1/2 rounded-b-lg border-2 border-foreground/50 bg-background/20 flex items-center justify-center">
-                      <ArrowDown className="h-5 w-5" />
-                    </div>
-                    <div className="absolute left-1/2 top-1/2 h-6 w-6 -translate-x-1/2 -translate-y-1/2 rounded-full bg-background/30" />
-                  </div>
+                <div className="absolute left-0 top-1/2 h-10 w-10 -translate-y-1/2 rounded-l-lg border-2 border-foreground/50 bg-background/20 flex items-center justify-center">
+                  <ArrowLeft className="h-5 w-5" />
                 </div>
-
-                {/* Right Answer (Right/D) */}
-                <div className="w-[38%]">
-                  <AnswerChoice
-                    letter="D"
-                    text={currentQuestion.choices[3]}
-                    isSelected={selectedAnswer === 3}
-                    isHighlighted={highlightedAnswer === 3}
-                    feedbackState={
-                      feedbackState && selectedAnswer === 3
-                        ? feedbackState
-                        : feedbackState && 3 === currentQuestion.correctIndex
-                        ? 'correct'
-                        : null
-                    }
-                    onClick={() => handleAnswer(3 as AnswerDirection)}
-                  />
+                <div className="absolute right-0 top-1/2 h-10 w-10 -translate-y-1/2 rounded-r-lg border-2 border-foreground/50 bg-background/20 flex items-center justify-center">
+                  <ArrowRight className="h-5 w-5" />
                 </div>
-              </div>
-
-              {/* Bottom Answer (Down/C) */}
-              <div className="absolute bottom-0 left-1/2 w-[40%] -translate-x-1/2">
-                <AnswerChoice
-                  letter="C"
-                  text={currentQuestion.choices[2]}
-                  isSelected={selectedAnswer === 2}
-                  isHighlighted={highlightedAnswer === 2}
-                  feedbackState={
-                    feedbackState && selectedAnswer === 2
-                      ? feedbackState
-                      : feedbackState && 2 === currentQuestion.correctIndex
-                      ? 'correct'
-                      : null
-                  }
-                  onClick={() => handleAnswer(2 as AnswerDirection)}
-                />
+                <div className="absolute bottom-0 left-1/2 h-10 w-10 -translate-x-1/2 rounded-b-lg border-2 border-foreground/50 bg-background/20 flex items-center justify-center">
+                  <ArrowDown className="h-5 w-5" />
+                </div>
+                <div className="absolute left-1/2 top-1/2 h-6 w-6 -translate-x-1/2 -translate-y-1/2 rounded-full bg-background/30" />
               </div>
             </div>
+
+            {/* Right Answer (Right/D) */}
+            <div className="w-[28%] pl-6 text-left">
+              <AnswerChoice
+                letter="D"
+                text={currentQuestion.choices[3]}
+                isSelected={selectedAnswer === 3}
+                isHighlighted={highlightedAnswer === 3}
+                feedbackState={
+                  feedbackState && selectedAnswer === 3
+                    ? feedbackState
+                    : feedbackState && 3 === currentQuestion.correctIndex
+                    ? 'correct'
+                    : null
+                }
+                onClick={() => handleAnswer(3 as AnswerDirection)}
+              />
+            </div>
+          </div>
+
+          {/* Bottom Answer (Down/C) */}
+          <div className="absolute bottom-0 left-1/2 w-[26%] -translate-x-1/2">
+            <AnswerChoice
+              letter="C"
+              text={currentQuestion.choices[2]}
+              isSelected={selectedAnswer === 2}
+              isHighlighted={highlightedAnswer === 2}
+              feedbackState={
+                feedbackState && selectedAnswer === 2
+                  ? feedbackState
+                  : feedbackState && 2 === currentQuestion.correctIndex
+                  ? 'correct'
+                  : null
+              }
+              onClick={() => handleAnswer(2 as AnswerDirection)}
+            />
           </div>
         </div>
       </div>

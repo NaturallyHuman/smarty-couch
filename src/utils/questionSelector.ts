@@ -39,7 +39,7 @@ export const selectQuestions = async (
     .select('*')
     .eq('difficulty', difficulty);
 
-  if (category !== 'All') {
+  if (category !== 'All' && category !== 'Mixed') {
     query = query.eq('category', category);
   }
 
@@ -59,7 +59,7 @@ export const selectQuestions = async (
       .select('*')
       .eq('difficulty', difficulty);
 
-    if (category !== 'All') {
+    if (category !== 'All' && category !== 'Mixed') {
       retryQuery = retryQuery.eq('category', category);
     }
 

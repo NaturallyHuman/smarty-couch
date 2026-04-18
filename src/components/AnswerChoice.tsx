@@ -1,5 +1,4 @@
 import { cn } from '@/lib/utils';
-import { Check, X } from 'lucide-react';
 
 interface AnswerChoiceProps {
   letter: 'A' | 'B' | 'C' | 'D';
@@ -11,7 +10,6 @@ interface AnswerChoiceProps {
 }
 
 export const AnswerChoice = ({
-  letter,
   text,
   isSelected,
   isHighlighted,
@@ -24,26 +22,19 @@ export const AnswerChoice = ({
     <button
       onClick={onClick}
       className={cn(
-        'relative w-full rounded-xl p-5 text-center transition-all duration-200',
-        'border-2 border-border/50 bg-card/30 backdrop-blur-sm',
-        'focus:outline-none',
-        'text-lg font-medium leading-tight',
-        'min-h-[80px] flex items-center justify-center',
+        'w-full bg-transparent border-0 p-0 focus:outline-none transition-colors duration-200',
+        'text-xl font-medium leading-snug text-center',
         {
-          // Normal state
-          'hover:border-primary/50 hover:bg-card/50': !isHighlighted && !isSelected && !showFeedback,
-          // Highlighted state (D-pad navigation)
-          'border-primary bg-primary/20 shadow-[0_0_20px_hsl(var(--primary)/0.3)]': isHighlighted && !showFeedback,
-          // Selected state (locked in)
-          'border-primary bg-primary/30': isSelected && !showFeedback,
-          // Correct feedback
-          'border-success bg-success/30 animate-pulse': feedbackState === 'correct',
-          // Incorrect feedback
-          'border-destructive bg-destructive/30': feedbackState === 'incorrect',
+          'text-foreground': !isHighlighted && !isSelected && !showFeedback,
+          'text-primary [text-shadow:0_0_18px_hsl(var(--primary)/0.7)]':
+            (isHighlighted || isSelected) && !showFeedback,
+          'text-success [text-shadow:0_0_18px_hsl(var(--success)/0.7)]':
+            feedbackState === 'correct',
+          'text-destructive line-through opacity-80': feedbackState === 'incorrect',
         }
       )}
     >
-      <span className="block">{text}</span>
+      {text}
     </button>
   );
 };

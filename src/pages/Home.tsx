@@ -22,7 +22,7 @@ const Home = () => {
   const handlePlaySolo = () => {
     const gameState: GameState = {
       mode: 'solo',
-      category: '',
+      category: 'Mixed',
       currentRound: 1,
       totalRounds: 3,
       currentPlayer: 0,
@@ -40,13 +40,13 @@ const Home = () => {
       currentMaxStreak: 0,
       usedQuestionIds: [],
     };
-    navigate('/category', { state: { gameState } });
+    navigate('/round-intro', { state: { gameState } });
   };
 
   const handlePlayTwoPlayer = () => {
     const gameState: GameState = {
       mode: 'two-player',
-      category: '',
+      category: 'Mixed',
       currentRound: 1,
       totalRounds: 4,
       currentPlayer: 0,
@@ -74,7 +74,7 @@ const Home = () => {
       currentMaxStreak: 0,
       usedQuestionIds: [],
     };
-    navigate('/category', { state: { gameState } });
+    navigate('/round-intro', { state: { gameState } });
   };
 
   return (

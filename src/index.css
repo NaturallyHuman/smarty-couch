@@ -91,6 +91,6 @@ All colors MUST be HSL.
     height: min(90vh, calc(90vw * 9 / 16));
     max-width: 90vw;
     max-height: 90vh;
-    overflow: auto;
+    overflow: hidden;
   }
 }

@@ -7,14 +7,12 @@ const RoundIntro = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const gameState = location.state?.gameState as GameState;
-  const category = gameState?.category || 'All';
   const buttonRef = useRef<HTMLButtonElement>(null);
   const introAudioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     buttonRef.current?.focus();
-    
-    // Play intro sound effect
+
     introAudioRef.current = new Audio('/round-start.mp3');
     introAudioRef.current.volume = 0.5;
     introAudioRef.current.play().catch(error => {
@@ -44,7 +42,7 @@ const RoundIntro = () => {
         handleStart();
       } else if (e.key === 'Escape') {
         e.preventDefault();
-        navigate('/category', { state: { gameState } });
+        navigate('/');
       }
     };
 
@@ -56,30 +54,13 @@ const RoundIntro = () => {
     <div className="flex h-full w-full flex-col items-center justify-center px-[5%] py-[3%]">
       <div className="w-full max-w-[90%] text-center">
         <h1 className="mb-4 text-5xl font-bold">Get Ready!</h1>
-        <p className="mb-4 text-2xl text-primary">{category} Trivia</p>
+        <p className="mb-4 text-2xl text-primary">Mixed Trivia</p>
         {gameState && (
-          <p className="mb-8 text-xl text-muted-foreground">
+          <p className="mb-12 text-xl text-muted-foreground">
             Round {gameState.currentRound} of {gameState.totalRounds}
             {gameState.mode === 'two-player' && ` • ${gameState.players[gameState.currentPlayer].name}`}
           </p>
         )}
-
-        <div className="mb-16 grid gap-8 md:grid-cols-3">
-          <div className="rounded-2xl bg-card p-6">
-            <div className="text-3xl font-bold">6</div>
-            <div className="text-lg text-muted-foreground">Questions</div>
-          </div>
-
-          <div className="rounded-2xl bg-card p-6">
-            <div className="text-3xl font-bold">10s</div>
-            <div className="text-lg text-muted-foreground">Per Question</div>
-          </div>
-
-          <div className="rounded-2xl bg-card p-6">
-            <div className="text-3xl font-bold">Ramps Up</div>
-            <div className="text-lg text-muted-foreground">Difficulty</div>
-          </div>
-        </div>
 
         <TVButton
           ref={buttonRef}
