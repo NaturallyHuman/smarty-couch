@@ -1,31 +1,33 @@
 
-Three issues to address:
+The audio files I generated in the last edit replaced what had been there, but the originals were actually mislabeled JPEG files (not real MP3s) — that's why audio never played in the first place. So there isn't a working "original" to revert to.
 
-### 1. Audio not playing
-Likely causes:
-- `/question-music.mp3`, `/correct.mp3`, `/incorrect.mp3` files may not exist in `/public`
-- Audio init lives inside `fetchQuestions` — only runs once, but autoplay can be blocked before user interaction
+Here's how we can get the audio you actually wanted:
 
-Fix: Verify files exist (will check during implementation). Move audio init to a separate effect that triggers on first user keypress/click as a fallback for autoplay policies. Also ensure music starts on Home/RoundIntro (post-user-interaction) so it's already "unlocked" by the time Question loads.
+**Option A — You upload your originals**
+If you have the MP3s you originally intended (background music, correct, incorrect, round-start), drop them into the chat. I'll place them in `/public/` with the exact filenames the code already references:
+- `public/question-music.mp3`
+- `public/correct.mp3`
+- `public/incorrect.mp3`
+- `public/round-start.mp3`
 
-### 2. Move answers closer to arrows (~32px gap)
-In `src/pages/Question.tsx` the D-pad layout currently positions answers at the outer edges with large gaps. Tighten:
-- Top answer (A): position just above the up-arrow with ~32px gap
-- Bottom answer (C): just below down-arrow with ~32px gap
-- Left answer (B): just left of left-arrow with ~32px gap
-- Right answer (D): just right of right-arrow with ~32px gap
+No code changes needed — the audio refs in `Question.tsx` and `RoundIntro.tsx` will pick them up.
 
-Switch from `absolute` corner positioning to a layout anchored around the central D-pad, using fixed `gap` spacing of `32px` (e.g. `mr-8`/`ml-8`/`mb-8`/`mt-8`). Answer text widths shrink to fit naturally.
+**Option B — I generate proper 8-bit chiptune audio**
+Replace the current placeholder tones with richer arcade-style tracks that match the documented chiptune direction in project memory:
+- BGM: looping 8-bit melody with bass + lead, ~60–90s loop
+- Correct: short ascending arcade blip (2–3 notes)
+- Incorrect: descending buzzer
+- Round start: short fanfare
 
-### 3. TimerBar should snap full on new question
-In `src/components/TimerBar.tsx`, the bar uses `transition-all duration-1000 ease-linear`. When a new question loads and `timeRemaining` jumps from 0 → 10, it animates backward visibly.
+**Option C — Revert via History**
+Roll back to before the audio was touched. But heads-up: audio still won't play because the original files were not valid MP3s.
 
-Fix: Disable the transition when the bar is filling up (going from low to high), only animate when draining. Simplest: add a `key` reset or detect direction. Cleanest: have `Question.tsx` pass a `questionIndex` as `key` to `TimerBar`, forcing a remount per question so the fill state initializes instantly without transition. Alternatively, conditionally apply the transition class only when `percentage < previous percentage`.
+```text
+<lov-actions>
+  <lov-open-history>View History</lov-open-history>
+</lov-actions>
+```
 
-### Files to edit
-- `src/pages/Question.tsx` — tighten D-pad spacing (~32px), add `key={currentIndex}` to `TimerBar`, optionally add user-interaction audio unlock
-- `src/components/TimerBar.tsx` — ensure first render shows full bar with no animation (mount = instant fill via initial style)
-- `public/` — verify audio files exist; if missing, add fallback handling and surface an error
+**My recommendation:** Option A if you have the files handy (best fidelity to your vision), otherwise Option B.
 
-### Audio investigation step
-Before implementing, confirm whether `/public/question-music.mp3`, `/public/correct.mp3`, `/public/incorrect.mp3` exist. If they don't, we need to either generate them or update paths. Will check `public/` directory first thing in implementation.
+Which would you like?
