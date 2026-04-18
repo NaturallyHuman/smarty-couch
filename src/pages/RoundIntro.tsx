@@ -1,20 +1,53 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { GameState } from '@/types/game';
 
-const COUNTDOWN = 3;
+const DURATION_MS = 5000;
+
+const FIRST_ROUND_MESSAGES = [
+  "Here we go. Easy ones first.",
+  "Warm-up time. Don't get comfortable.",
+  "Let's start nice and slow.",
+  "Round one. Try not to overthink it.",
+  "Easy mode engaged. For now.",
+  "Stretch those brain muscles.",
+  "Starting light. It won't stay that way.",
+];
+
+const TAUNT_MESSAGES = [
+  "Not bad. But it's about to get harder. Think you can keep up?",
+  "Decent start. The next round won't be so kind.",
+  "You survived. Barely. Ready for worse?",
+  "Cute. Let's crank it up.",
+  "Warm-up's over. Real questions now.",
+  "Impressive… for a beginner. Bring it.",
+  "You're doing fine. The questions aren't.",
+  "Hope you studied. It gets meaner from here.",
+  "Easy mode is over. Try not to embarrass yourself.",
+  "Getting cocky? Let's fix that.",
+  "Nice work. Now forget everything you know.",
+  "That was the appetizer. Main course incoming.",
+  "Don't get comfortable. The gloves come off now.",
+  "Pat yourself on the back. Then panic.",
+];
+
+const pickRandom = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
 
 const RoundIntro = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const gameState = location.state?.gameState as GameState;
   const introAudioRef = useRef<HTMLAudioElement | null>(null);
-  const [secondsLeft, setSecondsLeft] = useState(COUNTDOWN);
+
+  const message = useMemo(() => {
+    const isFirstRound = !gameState || gameState.currentRound === 1;
+    return pickRandom(isFirstRound ? FIRST_ROUND_MESSAGES : TAUNT_MESSAGES);
+  }, [gameState]);
 
   useEffect(() => {
     introAudioRef.current = new Audio('/round-start.mp3');
     introAudioRef.current.volume = 0.5;
-    introAudioRef.current.play().catch(error => {
+    introAudioRef.current.play().catch((error) => {
       console.log('Intro audio autoplay blocked:', error);
     });
 
@@ -35,17 +68,8 @@ const RoundIntro = () => {
   };
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setSecondsLeft((s) => {
-        if (s <= 1) {
-          clearInterval(interval);
-          handleStart();
-          return 0;
-        }
-        return s - 1;
-      });
-    }, 1000);
-    return () => clearInterval(interval);
+    const timeout = setTimeout(handleStart, DURATION_MS);
+    return () => clearTimeout(timeout);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -66,20 +90,11 @@ const RoundIntro = () => {
   }, [gameState, navigate]);
 
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center px-[5%] py-[3%]">
-      <div className="w-full max-w-[90%] text-center">
-        <h1 className="mb-4 text-5xl font-bold">Get Ready!</h1>
-        <p className="mb-4 text-2xl text-primary">Mixed Trivia</p>
-        {gameState && (
-          <p className="mb-12 text-xl text-muted-foreground">
-            Round {gameState.currentRound} of {gameState.totalRounds}
-            {gameState.mode === 'two-player' && ` • ${gameState.players[gameState.currentPlayer].name}`}
-          </p>
-        )}
-
-        <div className="text-7xl font-bold text-primary tabular-nums">
-          {secondsLeft}
-        </div>
+    <div className="flex h-full w-full items-center justify-center px-[5%] py-[3%]">
+      <div className="w-full max-w-[85%] text-center animate-fade-in">
+        <p className="text-5xl md:text-6xl font-bold leading-tight text-primary">
+          {message}
+        </p>
       </div>
     </div>
   );
