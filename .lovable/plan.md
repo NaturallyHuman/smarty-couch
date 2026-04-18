@@ -1,33 +1,12 @@
 
-The audio files I generated in the last edit replaced what had been there, but the originals were actually mislabeled JPEG files (not real MP3s) — that's why audio never played in the first place. So there isn't a working "original" to revert to.
+This is a support question, not an implementation task — no code changes needed. The user is hitting a Git pull failure from their GitHub side.
 
-Here's how we can get the audio you actually wanted:
+Common causes for "can't pull" after Lovable pushes:
+1. **Local branch diverged** — they have local commits and Lovable also pushed; needs merge/rebase or `git pull --rebase`.
+2. **Auth issue** — expired PAT, SSH key not added, or 2FA without token.
+3. **Permission issue** — they're not a collaborator on the repo, or the org changed access.
+4. **Wrong remote** — cloned a fork or old URL.
+5. **Large file / LFS** — the audio MP3s I just added might be large enough to trip a push protection or LFS requirement on their end (unlikely but possible).
+6. **Branch protection** — default branch protected and they're trying to pull into a stale branch.
 
-**Option A — You upload your originals**
-If you have the MP3s you originally intended (background music, correct, incorrect, round-start), drop them into the chat. I'll place them in `/public/` with the exact filenames the code already references:
-- `public/question-music.mp3`
-- `public/correct.mp3`
-- `public/incorrect.mp3`
-- `public/round-start.mp3`
-
-No code changes needed — the audio refs in `Question.tsx` and `RoundIntro.tsx` will pick them up.
-
-**Option B — I generate proper 8-bit chiptune audio**
-Replace the current placeholder tones with richer arcade-style tracks that match the documented chiptune direction in project memory:
-- BGM: looping 8-bit melody with bass + lead, ~60–90s loop
-- Correct: short ascending arcade blip (2–3 notes)
-- Incorrect: descending buzzer
-- Round start: short fanfare
-
-**Option C — Revert via History**
-Roll back to before the audio was touched. But heads-up: audio still won't play because the original files were not valid MP3s.
-
-```text
-<lov-actions>
-  <lov-open-history>View History</lov-open-history>
-</lov-actions>
-```
-
-**My recommendation:** Option A if you have the files handy (best fidelity to your vision), otherwise Option B.
-
-Which would you like?
+I'll give them a short triage checklist with the exact commands and ask them to share the error message so I can pinpoint it. No plan tag needed for a Q&A reply — but the instructions require I keep all reasoning here. Final reply will be a concise troubleshooting message with the GitHub docs link.
