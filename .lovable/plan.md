@@ -1,35 +1,22 @@
 
-User wants `RoundIntro.tsx` to become a 5-second taunt/encouragement screen with randomized messages, escalating between rounds. Currently it shows "Get Ready! / Mixed Trivia / Round X of Y / countdown 3-2-1".
+User wants to simplify the Home screen:
+1. Remove the disabled "Settings" button
+2. Remove the player-mode selection step (Solo / Two Players / Back)
+3. Tapping "Play" should start the game directly
 
-Plan:
+Question: which mode by default? Looking at current code, solo and two-player both exist. User said "just start the game" — defaulting to **solo** is the safest assumption since it's the simpler/default experience and listed first. I'll go with solo and mention it so they can flip it if wrong.
 
-## Update RoundIntro to a randomized taunt screen
+## Plan
 
-**File:** `src/pages/RoundIntro.tsx`
+**File:** `src/pages/Home.tsx`
 
-1. Replace the 3-second countdown with a **5-second display** (auto-advance to `/question`).
-2. Remove the "Get Ready! / Mixed Trivia / Round X of Y" header and the visible 3-2-1 number.
-3. Add a pool of ~10–15 randomized taunt messages, e.g.:
-   - "Not bad. But it's about to get harder. Think you can keep up?"
-   - "Decent start. The next round won't be so kind."
-   - "You survived. Barely. Ready for worse?"
-   - "Cute. Let's crank it up."
-   - "Warm-up's over. Real questions now."
-   - "Impressive… for a beginner. Bring it."
-   - "You're doing fine. The questions aren't."
-   - "Round X incoming. Hope you studied."
-   - "Easy mode is over. Try not to embarrass yourself."
-   - "Getting cocky? Let's fix that."
-4. Pick one message at random on mount (`useMemo`).
-5. Keep Enter = skip ahead, Esc = home.
-6. Keep the round-start audio.
-7. For **Round 1** (no prior performance to taunt about), show a different intro pool like "Here we go." / "Easy ones first." so the taunt makes sense.
-8. Layout: single large centered message, primary color accent, subtle fade-in animation. No visible countdown — just auto-advance after 5s.
+- Delete the `showModeSelect` state and the entire mode-select branch (Solo / Two Players / Back).
+- Delete the `soloButtonRef` and the `useEffect` that focuses it.
+- Delete the disabled "Settings" button.
+- Keep only one centered "Play" button. Its `onClick` runs the existing `handlePlaySolo` logic directly (navigates to `/round-intro` with a fresh solo `GameState`).
+- `handlePlayTwoPlayer` and its button are removed entirely.
+- `playButtonRef` stays so D-pad focus lands on Play immediately.
 
-## Technical notes
-- Use `useMemo(() => pickRandom(messages), [])` to lock the message for the screen's lifetime.
-- Replace `setSecondsLeft` interval with a single `setTimeout(handleStart, 5000)`.
-- Use `animate-fade-in` (already in tailwind config) for entrance.
-- Branch message pool on `gameState.currentRound === 1` vs later rounds.
+Result: Home shows the title, tagline, and a single "Play" button → press it → game starts.
 
-No other files need changes. Routing already lands on `/round-intro` between rounds (per last edit that skipped `/round-transition`).
+Note: defaulting to **solo** mode. If you want two-player as the default instead, say the word and I'll swap it.
