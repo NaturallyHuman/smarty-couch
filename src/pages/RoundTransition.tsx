@@ -52,7 +52,8 @@ const RoundTransition = () => {
       setSecondsLeft((s) => {
         if (s <= 1) {
           clearInterval(interval);
-          goNext();
+          // Defer navigation so it doesn't fire during render
+          setTimeout(() => goNext(), 0);
           return 0;
         }
         return s - 1;
