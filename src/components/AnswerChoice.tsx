@@ -23,7 +23,7 @@ export const AnswerChoice = ({
       onClick={onClick}
       className={cn(
         'w-full bg-transparent border-0 p-0 focus:outline-none transition-colors duration-200',
-        'text-xl font-medium leading-snug text-center',
+        'text-xl font-medium leading-snug text-center whitespace-nowrap',
         {
           'text-foreground': !isHighlighted && !isSelected && !showFeedback,
           'text-primary [text-shadow:0_0_18px_hsl(var(--primary)/0.7)]':
