@@ -123,27 +123,34 @@ const Question = () => {
 
     audioManager.stopTrack('question', 600);
 
-    const currentPlayer = gameState.players[gameState.currentPlayer];
-    currentPlayer.totalScore += score;
-    currentPlayer.correctAnswers += correctCount;
-    currentPlayer.totalQuestions += attemptedCount;
-    currentPlayer.maxStreak = Math.max(currentPlayer.maxStreak, maxStreak);
-    currentPlayer.roundScores.push(score);
+    const currentPlayerIdx = gameState.currentPlayer;
+    const currentPlayer = gameState.players[currentPlayerIdx];
 
-    // Merge category aggregates onto the player.
+    // Merge category aggregates immutably.
     const mergedCorrect = { ...(currentPlayer.correctByCategory || {}) };
     Object.entries(correctByCategory).forEach(([k, v]) => {
       mergedCorrect[k] = (mergedCorrect[k] || 0) + v;
     });
-    currentPlayer.correctByCategory = mergedCorrect;
-
     const mergedAttempted = { ...(currentPlayer.attemptedByCategory || {}) };
     Object.entries(attemptedByCategory).forEach(([k, v]) => {
       mergedAttempted[k] = (mergedAttempted[k] || 0) + v;
     });
-    currentPlayer.attemptedByCategory = mergedAttempted;
 
-    currentPlayer.endedOnWrong = lastWasWrongRef.current;
+    const updatedPlayer = {
+      ...currentPlayer,
+      totalScore: currentPlayer.totalScore + score,
+      correctAnswers: currentPlayer.correctAnswers + correctCount,
+      totalQuestions: currentPlayer.totalQuestions + attemptedCount,
+      maxStreak: Math.max(currentPlayer.maxStreak, maxStreak),
+      roundScores: [...currentPlayer.roundScores, score],
+      correctByCategory: mergedCorrect,
+      attemptedByCategory: mergedAttempted,
+      endedOnWrong: lastWasWrongRef.current,
+    };
+
+    const updatedPlayers = gameState.players.map((p, i) =>
+      i === currentPlayerIdx ? updatedPlayer : p
+    );
 
     const usedIds = [
       ...(gameState.usedQuestionIds || []),
@@ -161,7 +168,7 @@ const Question = () => {
 
     const updatedGameState: GameState = {
       ...gameState,
-      players: [...gameState.players],
+      players: updatedPlayers,
       currentRound: nextRound,
       currentPlayer: nextPlayer,
       currentRoundScore: 0,
