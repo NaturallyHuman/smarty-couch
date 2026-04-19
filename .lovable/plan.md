@@ -1,59 +1,90 @@
 
-The user wants:
-1. **Seamless question music** across a full round (no restart between questions)
-2. **Smooth crossfade** from RoundIntro music → Question music
+Big update — five connected changes. Here's the plan.
 
-Let me look at how Question.tsx currently handles audio to understand the restart issue.
-<lov-tool-use id="toolu_vrtx_01VayWDtsVW6x9qCvHXhjFb4" name="code--view" integration-id="code" data="{\"file_path\": \"src/pages/Question.tsx\"}">
-</lov-tool-use>
+## 1. Streak bonus scoring (escalating)
 
-<lov-tool-use id="toolu_vrtx_01DeQZUKDo6xT1FaofMUuLRJ" name="code--view" integration-id="code" data="{\"file_path\": \"src/pages/Question.tsx\"}">
-</lov-tool-use>
-Now I understand both files. The user wants:
-1. Question music to keep playing seamlessly across questions (it already does — music is in Question.tsx and only fades out when leaving the round).
-2. Intro music (RoundIntro) to crossfade smoothly into question music — no harsh break.
+Replace the current scoring (base + timer + flat streak multiplier) with a simpler, escalating model the user described:
 
-The harsh break happens because RoundIntro fades out its music on unmount, then Question.tsx mounts and starts a fresh fade-in. There's a gap and they don't overlap.
+- Every correct answer = **100 points** (base).
+- Streak bonuses kick in at **3 in a row** and grow each additional correct answer:
+  - 3-in-a-row: +50
+  - 4-in-a-row: +100
+  - 5-in-a-row: +200
+  - 6-in-a-row: +400
+  - 7+: +800 (caps to keep numbers sane)
+- Wrong answer / timeout resets the streak to 0.
+- Drop the timer bonus (no per-question timer anymore — see #2).
 
-Solution: shared global audio context — a singleton audio manager that persists across route changes so the intro track can crossfade with the question track.
+File: `src/utils/scoring.ts` — rewrite `calculateScore` with the new schedule.
 
-<lov-plan>
-## Goal
-Make audio seamless: question music should play continuously across all questions in a round (already works), and the round-intro music should **crossfade** smoothly into the question music with no harsh cut.
+## 2. One-minute round (answer as many as you can)
 
-## Why it sounds harsh today
-Each page owns its own `<audio>` element via `useRef`. When `RoundIntro` unmounts it fades its track out, then `Question` mounts and starts fading its own track in — but because the unmount fade and mount fade aren't coordinated (and React unmounts the old route before the new one's audio is ready), you get a gap and a noticeable seam.
+Each round becomes a **60-second sprint**. Players answer questions back-to-back; the round ends when the timer hits zero, not after N questions.
 
-## Fix: a tiny shared audio manager
+Changes in `src/pages/Question.tsx`:
+- Replace per-question timer (`QUESTION_TIME = 10`) with a single round-level timer (`ROUND_TIME = 60`).
+- Remove `QUESTIONS_PER_ROUND = 10`. Instead, fetch a large pool (e.g. 30) up front so we never run out mid-round, and just keep advancing through them.
+- Timer bar (`TimerBar`) reflects the **round** countdown, not the question. It starts full at the beginning of the round and drains continuously across questions — no reset between questions.
+- When the player answers (correct or wrong), show feedback briefly (~600ms — shorter than today's 1200ms so the sprint feels snappy) then auto-advance to the next question.
+- Wrong answer no longer ends the question with a long pause; just flash red, reset streak, move on.
+- When the 60s timer hits zero, end the round (same flow as today's "last question answered").
+- Remove the per-question timeout logic; the round timer handles end-of-round.
 
-**New file: `src/utils/audioManager.ts`**
-A singleton that owns long-lived `HTMLAudioElement`s by key (`'intro'`, `'question'`) so they survive route changes. It exposes:
-- `playTrack(key, src, { volume, loop })` — start a track, fading it in.
-- `crossfade(fromKey, toKey, src, { volume, loop, durationMs })` — start `toKey` fading **in** while `fromKey` fades **out** *simultaneously* (true crossfade, no gap).
-- `stopTrack(key, durationMs)` — fade out and pause.
-- `setTrackVolume(key, volume, durationMs)` — for pause/resume dimming.
+`TimerBar` already accepts `timeRemaining` / `maxTime` and animates smoothly — we just feed it the round timer and stop using `key={currentIndex}` (which currently forces a reset between questions).
 
-Internally it reuses the existing `fadeIn`/`fadeOut` helpers; no new fade math.
+## 3. Category breakdown on results screen
 
-## Wiring
+End-of-game screen needs a per-category breakdown plus strongest/weakest highlighted.
 
-**`src/pages/RoundIntro.tsx`**
-- Replace local `new Audio('/round-start.mp3')` with `audioManager.playTrack('intro', '/round-start.mp3', { volume: 0.5 })`.
-- On unmount, **do not** stop the intro track. Instead, leave it running so `Question` can crossfade it out.
+- Track per-category **correct + attempted** during the round (we already track `correctByCategory`; add an `attemptedByCategory` counter alongside it).
+- Pass both into `GameOver` (or a new results screen) via `gameState` / location state.
+- Render a list:
+  - Each category: correct / attempted (e.g. "Movies — 4 / 6, 67%")
+  - Highlight the strongest (highest accuracy, min 2 attempts) in green
+  - Highlight the weakest in red
 
-**`src/pages/Question.tsx`**
-- On mount (when questions are ready), call `audioManager.crossfade('intro', 'question', '/question-music.mp3', { volume: 0.35, loop: true, durationMs: 1200 })`. This starts the question loop fading in *while* the intro track fades out over the same window — no gap, no harsh cut.
-- Remove the local `musicRef` for the BGM. Question music now lives in the manager and persists across the 10 questions naturally (it already did via the same ref, but now it's even more robust).
-- Pause dialog: `audioManager.setTrackVolume('question', 0, 300)` to duck; resume restores to 0.35.
-- On round end / quit / unmount: `audioManager.stopTrack('question', 600)`.
+File: `src/pages/GameOver.tsx` — expand layout to include the breakdown section.
 
-**No changes** to `audioFade.ts` — it already handles cancelling in-flight fades on the same element, which is exactly what crossfade needs.
+## 4. Last 10 scores history
 
-## Result
-- Intro plays → user lands on first question → intro fades down while question loop fades up over ~1.2s → question loop continues uninterrupted across all 10 questions → fades out cleanly at round end / quit.
-- No more page-unmount audio gap. No more abrupt starts.
+Persist a rolling list of the player's last 10 game scores so they can compare.
+
+- Extend `LifetimeStats` in `src/types/game.ts`: add `recentScores: number[]` (newest first, max length 10).
+- Update `src/utils/lifetimeStats.ts` so `updateLifetimeStats` (or a new `recordGameScore`) prepends the new total and trims to 10.
+- On `GameOver`, show a small list/bar chart of the last 10 scores. The current game's score is highlighted. Above/below average is visually obvious (e.g. taller bars = higher score).
+
+## 5. Random silly awards
+
+At game end, award the player 1–3 randomly chosen humorous "achievements" based on their actual play data, plus pure-random gag awards.
+
+New file: `src/utils/awards.ts` exporting a list like:
+
+- "🛋️ Couch Potato Champion" — always eligible
+- "🐢 Slow and Steady" — answered fewer than 8 questions
+- "⚡ Caffeinated" — answered 20+ questions
+- "🎯 Sniper" — accuracy ≥ 80%
+- "🎲 Lucky Guesser" — accuracy 25–40%
+- "🔥 On Fire" — max streak ≥ 5
+- "🧊 Ice Cold" — got 3 wrong in a row at any point
+- "🦉 Night Owl" — played after 10pm local time
+- "🎭 Drama Queen" — finished with a wrong answer
+- "🏆 Self-Proclaimed Genius" — score above their personal best
+- Plus pure-gag random ones: "🐸 Frog Whisperer", "🥔 Mashed Potato Enthusiast", "👑 King of the Remote", "🛸 Probably an Alien"
+
+Pick 2–3 to display on `GameOver`. Mix one earned (based on stats) + one random gag for variety.
 
 ## Files touched
-- `src/utils/audioManager.ts` (new)
-- `src/pages/RoundIntro.tsx` (use manager, don't stop on unmount)
-- `src/pages/Question.tsx` (crossfade in, manager-owned BGM, pause/resume/quit via manager)
+
+- `src/types/game.ts` — add `recentScores`, `attemptedByCategory`, simplify `RoundResult` if needed
+- `src/utils/scoring.ts` — new escalating streak schedule, drop timer bonus
+- `src/utils/lifetimeStats.ts` — record recent scores
+- `src/utils/awards.ts` — **new**, award pool + picker
+- `src/pages/Question.tsx` — round-level 60s timer, no per-question count cap, faster feedback, track attempted-by-category
+- `src/pages/GameOver.tsx` — category breakdown, strongest/weakest, last-10-scores chart, silly awards
+- `src/components/TimerBar.tsx` — minor: ensure it animates smoothly across the full minute (no key reset)
+
+## Notes / decisions made
+
+- **Default mode is solo** (per recent change). The new GameOver layout is designed for solo; two-player mode still works but shows one combined breakdown — we can split it later if you ever bring two-player back to the main flow.
+- **Round count**: with 60-second rounds, keeping 3 rounds total means ~3 minutes of play. That feels right. If you want fewer/more rounds, easy to tweak.
+- **Difficulty still escalates per round** (easy → medium → hard) via existing `getDifficultyForRound`. No change there.
