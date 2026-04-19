@@ -21,6 +21,8 @@ export interface PlayerStats {
   attemptedByCategory?: { [category: string]: number };
   // Whether the game ended on a wrong answer (for awards)
   endedOnWrong?: boolean;
+  // Total streak bonus points earned across all rounds in the current game
+  streakBonusTotal?: number;
 }
 
 export interface GameState {

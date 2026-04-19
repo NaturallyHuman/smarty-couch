@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { TVButton } from '@/components/TVButton';
 import { GameState, PlayerStats } from '@/types/game';
@@ -25,35 +25,43 @@ const getTierIndex = (score: number): number => {
   return idx;
 };
 
-const getBestCategory = (player: PlayerStats): string | undefined => {
+interface CategoryStat {
+  cat: string;
+  correct: number;
+  attempted: number;
+  acc: number;
+}
+
+const getCategoryStats = (player: PlayerStats): CategoryStat[] => {
   const attempted = player.attemptedByCategory || {};
   const correct = player.correctByCategory || {};
-  let best: { cat: string; acc: number; correct: number } | undefined;
-  for (const cat of Object.keys(attempted)) {
-    const a = attempted[cat] || 0;
-    if (a < 2) continue;
-    const c = correct[cat] || 0;
-    const acc = c / a;
-    if (!best || acc > best.acc || (acc === best.acc && c > best.correct)) {
-      best = { cat, acc, correct: c };
-    }
-  }
-  return best?.cat;
+  return Object.keys(attempted)
+    .filter((c) => (attempted[c] || 0) >= 2)
+    .map((cat) => {
+      const a = attempted[cat] || 0;
+      const c = correct[cat] || 0;
+      return { cat, correct: c, attempted: a, acc: c / a };
+    });
 };
 
-const computePercentile = (current: number, history: number[]): number | null => {
-  // history includes the current score (recorded by recordGameScore).
-  if (!history || history.length < 2) return null;
-  const others = [...history];
-  // Remove a single occurrence of current to compare against past runs.
-  const i = others.indexOf(current);
-  if (i >= 0) others.splice(i, 1);
-  if (others.length === 0) return null;
-  const beaten = others.filter((s) => current > s).length;
-  // "Top X%" = how high you rank. Higher score → smaller X.
-  const rankFromTop = others.length - beaten; // 0 = best ever
-  const pct = Math.max(1, Math.round(((rankFromTop + 1) / (others.length + 1)) * 100));
-  return pct;
+const getBestCategory = (player: PlayerStats): CategoryStat | undefined => {
+  const stats = getCategoryStats(player);
+  if (stats.length === 0) return undefined;
+  return stats.reduce((best, cur) => {
+    if (cur.acc > best.acc) return cur;
+    if (cur.acc === best.acc && cur.correct > best.correct) return cur;
+    return best;
+  });
+};
+
+const getWorstCategory = (player: PlayerStats): CategoryStat | undefined => {
+  const stats = getCategoryStats(player);
+  if (stats.length < 2) return undefined;
+  return stats.reduce((worst, cur) => {
+    if (cur.acc < worst.acc) return cur;
+    if (cur.acc === worst.acc && cur.correct < worst.correct) return cur;
+    return worst;
+  });
 };
 
 const GameOver = () => {
@@ -64,14 +72,11 @@ const GameOver = () => {
 
   const gameState = location.state?.gameState as GameState;
 
-  const [recentScores, setRecentScores] = useState<number[]>([]);
-
   useEffect(() => {
     if (!gameState || recordedRef.current) return;
     recordedRef.current = true;
     const finalScore = gameState.players[0].totalScore;
-    const { stats } = recordGameScore(finalScore);
-    setRecentScores(stats.recentScores);
+    recordGameScore(finalScore);
   }, [gameState]);
 
   useEffect(() => {
@@ -93,19 +98,11 @@ const GameOver = () => {
   const finalScore = player?.totalScore ?? 0;
   const tierIdx = useMemo(() => getTierIndex(finalScore), [finalScore]);
   const currentTier = TIERS[tierIdx];
-  const nextTier = TIERS[tierIdx + 1];
-  const ptsToNext = nextTier ? nextTier.threshold - finalScore : 0;
-
-  const accuracy = useMemo(() => {
-    if (!player || !player.totalQuestions) return 0;
-    return Math.round((player.correctAnswers / player.totalQuestions) * 100);
-  }, [player]);
 
   const bestCategory = useMemo(() => (player ? getBestCategory(player) : undefined), [player]);
-  const percentile = useMemo(
-    () => computePercentile(finalScore, recentScores),
-    [finalScore, recentScores]
-  );
+  const worstCategory = useMemo(() => (player ? getWorstCategory(player) : undefined), [player]);
+  const streakBonusTotal = player?.streakBonusTotal ?? 0;
+  const maxStreak = player?.maxStreak ?? 0;
 
   if (!gameState) {
     navigate('/');
@@ -145,82 +142,55 @@ const GameOver = () => {
       <div className="relative z-10 flex flex-col items-center text-center">
         {/* Eyebrow */}
         <div className="mb-3 text-sm font-bold uppercase tracking-[0.3em] text-muted-foreground">
-          Quiz Complete
+          Final Score
         </div>
 
         {/* Score */}
-        <div className="mb-3 text-7xl font-bold tabular-nums text-primary animate-scale-in">
+        <div className="mb-4 text-7xl font-bold tabular-nums text-primary animate-scale-in">
           {finalScore.toLocaleString()}
         </div>
 
         {/* Tier name */}
-        <div className="mb-1 text-3xl font-bold text-foreground">{currentTier.name}</div>
-
-        {/* Percentile */}
-        {percentile !== null && (
-          <div className="mb-6 text-base text-muted-foreground">
-            Top {percentile}% of your runs
-          </div>
-        )}
-        {percentile === null && <div className="mb-6 text-base text-muted-foreground">Your first run!</div>}
-
-        {/* Tier ladder */}
-        <div className="relative mb-3 w-full max-w-3xl">
-          <div className="absolute left-[8%] right-[8%] top-1/2 h-px -translate-y-1/2 bg-border" />
-          <div className="relative flex items-center justify-between">
-            {TIERS.map((t, i) => {
-              const isActive = i === tierIdx;
-              const isPast = i < tierIdx;
-              return (
-                <div key={t.name} className="flex flex-col items-center gap-2">
-                  <div
-                    className={`rounded-full px-3 py-1 text-xs font-semibold transition-all ${
-                      isActive
-                        ? 'scale-110 bg-primary text-primary-foreground shadow-lg'
-                        : isPast
-                        ? 'bg-secondary text-secondary-foreground'
-                        : 'bg-muted text-muted-foreground'
-                    }`}
-                  >
-                    {t.name}
-                  </div>
-                  {isActive && (
-                    <div className="text-primary" aria-hidden>
-                      ▲
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Distance to next */}
-        <div className="mb-8 text-sm text-muted-foreground">
-          {nextTier
-            ? `${ptsToNext.toLocaleString()} pts to ${nextTier.name}`
-            : 'Max rank reached!'}
+        <div className="mb-12 text-3xl font-bold text-foreground">
+          {currentTier.name}!
         </div>
 
         {/* Stats row */}
-        <div className="mb-10 flex items-center gap-6 text-base">
-          <span className="text-foreground">
-            <span className="text-muted-foreground">Accuracy </span>
-            <span className="font-bold">{accuracy}%</span>
-          </span>
-          <span className="text-muted-foreground">·</span>
-          <span className="text-foreground">
-            <span className="text-muted-foreground">Best streak </span>
-            <span className="font-bold">{player?.maxStreak ?? 0}</span>
-          </span>
+        <div className="mb-12 flex items-start justify-center gap-16">
+          <div className="flex flex-col items-center">
+            <div className="mb-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
+              Best streak
+            </div>
+            <div className="text-4xl font-bold tabular-nums text-foreground">
+              {maxStreak}
+            </div>
+            <div className="mt-1 text-sm text-warning">
+              {streakBonusTotal.toLocaleString()} points!
+            </div>
+          </div>
+
           {bestCategory && (
-            <>
-              <span className="text-muted-foreground">·</span>
-              <span className="text-foreground">
-                <span className="text-muted-foreground">Best category </span>
-                <span className="font-bold text-success">{bestCategory}</span>
-              </span>
-            </>
+            <div className="flex flex-col items-center">
+              <div className="mb-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                Best category
+              </div>
+              <div className="text-2xl font-bold text-success">{bestCategory.cat}</div>
+              <div className="mt-1 text-sm tabular-nums text-muted-foreground">
+                {bestCategory.correct}/{bestCategory.attempted}
+              </div>
+            </div>
+          )}
+
+          {worstCategory && (
+            <div className="flex flex-col items-center">
+              <div className="mb-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                Worst category
+              </div>
+              <div className="text-2xl font-bold text-destructive">{worstCategory.cat}</div>
+              <div className="mt-1 text-sm tabular-nums text-muted-foreground">
+                {worstCategory.correct}/{worstCategory.attempted}
+              </div>
+            </div>
           )}
         </div>
 
