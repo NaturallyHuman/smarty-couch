@@ -352,7 +352,7 @@ const Question = () => {
             }}
           >
             {/* Top — A (Up) */}
-            <div className="col-start-2 row-start-1 w-full text-center">
+            <div className="col-start-1 col-span-3 row-start-1 w-full text-center">
               <AnswerChoice
                 letter="A"
                 text={currentQuestion.choices[0]}
@@ -445,7 +445,7 @@ const Question = () => {
             </div>
 
             {/* Bottom — C (Down) */}
-            <div className="col-start-2 row-start-3 w-full text-center">
+            <div className="col-start-1 col-span-3 row-start-3 w-full text-center">
               <AnswerChoice
                 letter="C"
                 text={currentQuestion.choices[2]}
