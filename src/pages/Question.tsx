@@ -38,6 +38,8 @@ const Question = () => {
   const [showPauseDialog, setShowPauseDialog] = useState(false);
   const [streakBonus, setStreakBonus] = useState(0);
   const [endedOnWrong, setEndedOnWrong] = useState(false);
+  const [streakLostFlash, setStreakLostFlash] = useState(false);
+  const [scorePopup, setScorePopup] = useState<{ base: number; bonus: number; key: number } | null>(null);
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const feedbackTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
