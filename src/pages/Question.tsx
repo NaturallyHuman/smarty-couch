@@ -321,7 +321,7 @@ const Question = () => {
           <TimerBar
             timeRemaining={timeRemaining}
             maxTime={ROUND_TIME}
-            questionNumber={attemptedCount + 1}
+            score={score}
           />
         </div>
 
@@ -406,10 +406,10 @@ const Question = () => {
                 <div className="absolute bottom-0 left-1/2 grid h-10 w-10 -translate-x-1/2 place-items-center rounded-md border border-foreground/40 bg-card/40">
                   <div className="h-0 w-0 border-l-[6px] border-r-[6px] border-t-[8px] border-l-transparent border-r-transparent border-t-foreground/70" />
                 </div>
-                {/* Center badge with live score */}
+                {/* Center badge with bonus count */}
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
                   <div className="relative grid h-14 min-w-20 place-items-center rounded-full border-2 border-primary/60 bg-card px-3 text-xl font-bold tabular-nums text-foreground shadow-[0_0_18px_hsl(var(--primary)/0.35)]">
-                    {score.toLocaleString()}
+                    {streakBonus.toLocaleString()}
                     {scorePopup && (
                       <span
                         key={scorePopup.key}
