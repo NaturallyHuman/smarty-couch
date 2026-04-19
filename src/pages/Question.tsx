@@ -321,7 +321,7 @@ const Question = () => {
           <TimerBar
             timeRemaining={timeRemaining}
             maxTime={ROUND_TIME}
-            score={score}
+            score={(gameState?.players[gameState.currentPlayer]?.totalScore ?? 0) + score}
           />
         </div>
 
@@ -408,8 +408,8 @@ const Question = () => {
                 </div>
                 {/* Center badge with bonus count */}
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                  <div className="relative grid h-14 min-w-20 place-items-center rounded-full border-2 border-primary/60 bg-card px-3 text-xl font-bold tabular-nums text-foreground shadow-[0_0_18px_hsl(var(--primary)/0.35)]">
-                    {streakBonus.toLocaleString()}
+                  <div className="relative grid h-14 min-w-20 place-items-center rounded-full bg-card px-3 text-xl font-bold tabular-nums text-foreground">
+                    {streak}
                     {scorePopup && (
                       <span
                         key={scorePopup.key}
