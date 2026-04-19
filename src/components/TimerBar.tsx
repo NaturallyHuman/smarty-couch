@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { Hourglass } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface TimerBarProps {
@@ -15,8 +16,6 @@ export const TimerBar = ({ timeRemaining, maxTime }: TimerBarProps) => {
   const prevPctRef = useRef(percentage);
 
   useEffect(() => {
-    // Only animate when the bar is draining (percentage decreasing).
-    // When it jumps up (e.g. new question reset), skip the animation.
     if (percentage < prevPctRef.current) {
       setAnimate(true);
     } else if (percentage > prevPctRef.current) {
@@ -27,17 +26,15 @@ export const TimerBar = ({ timeRemaining, maxTime }: TimerBarProps) => {
 
   return (
     <div className="flex w-full items-center gap-4">
-      <span
-        className={cn('text-2xl font-bold tabular-nums', {
+      <Hourglass
+        className={cn('h-6 w-6 shrink-0', {
           'text-destructive animate-pulse': isLow,
-          'text-foreground': !isLow,
+          'text-muted-foreground': !isLow,
         })}
-      >
-        {timeRemaining}
-      </span>
-      <div className="h-3 flex-1 overflow-hidden rounded-full bg-secondary">
+      />
+      <div className="flex h-3 flex-1 overflow-hidden rounded-full bg-secondary">
         <div
-          className={cn('h-full ease-linear', {
+          className={cn('h-full ease-linear ml-auto', {
             'transition-all duration-1000': animate,
             'bg-destructive': isLow,
             'bg-primary': !isLow,
