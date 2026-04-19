@@ -316,17 +316,27 @@ const Question = () => {
   return (
     <>
       <div className="flex h-full w-full flex-col px-[5%] py-[3%]">
-        {/* Round-level Timer Bar with question counter */}
-        <div className="mb-6">
-          <TimerBar
-            timeRemaining={timeRemaining}
-            maxTime={ROUND_TIME}
-            score={score}
-          />
+        {/* Round-level Timer Bar — drains continuously across all questions */}
+        <div className="mb-4">
+          <TimerBar timeRemaining={timeRemaining} maxTime={ROUND_TIME} />
         </div>
 
-        <div className="mb-3 flex items-center justify-center gap-6 text-base">
+        <div className="mb-2 flex items-center justify-center gap-6 text-base">
           <span className="text-primary">{currentQuestion.category}</span>
+          <span className="relative text-muted-foreground">
+            Score: <span className="font-bold text-foreground">{score.toLocaleString()}</span>
+            {scorePopup && (
+              <span
+                key={scorePopup.key}
+                className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-sm font-bold text-success animate-fade-in"
+              >
+                +{scorePopup.base}
+                {scorePopup.bonus > 0 && (
+                  <span className="ml-1 text-warning">+{scorePopup.bonus} bonus</span>
+                )}
+              </span>
+            )}
+          </span>
           {streak >= 2 && !streakLostFlash && (
             <span className="text-warning font-bold">🔥 {streak} streak</span>
           )}
@@ -335,24 +345,21 @@ const Question = () => {
           )}
         </div>
 
-        {/* Question text — large, centered, with breathing room */}
-        <h1 className="mt-4 mb-10 text-center text-3xl font-bold leading-tight px-12">
+        <h1 className="mb-6 text-center text-2xl font-semibold leading-tight px-8">
           {currentQuestion.text}
         </h1>
 
-        {/* Answers arranged around a central D-pad */}
         <div className="flex flex-1 items-center justify-center">
           <div
             className="grid items-center justify-items-center"
             style={{
-              gridTemplateColumns: 'minmax(180px, 1fr) 140px minmax(180px, 1fr)',
-              gridTemplateRows: 'auto 140px auto',
-              columnGap: '40px',
-              rowGap: '24px',
+              gridTemplateColumns: '360px 128px 360px',
+              gridTemplateRows: 'auto 128px auto',
+              columnGap: '32px',
+              rowGap: '32px',
             }}
           >
-            {/* Top — A (Up) */}
-            <div className="col-start-2 row-start-1 w-full text-center">
+            <div className="col-span-3 w-[420px] text-center">
               <AnswerChoice
                 letter="A"
                 text={currentQuestion.choices[0]}
@@ -369,8 +376,7 @@ const Question = () => {
               />
             </div>
 
-            {/* Left — B (Left) */}
-            <div className="col-start-1 row-start-2 w-full text-right">
+            <div className="w-[360px] text-right">
               <AnswerChoice
                 letter="B"
                 text={currentQuestion.choices[1]}
@@ -387,47 +393,25 @@ const Question = () => {
               />
             </div>
 
-            {/* Center D-pad with question number */}
-            <div className="col-start-2 row-start-2 flex h-36 w-36 shrink-0 items-center justify-center">
-              <div className="relative h-full w-full">
-                {/* Up arrow */}
-                <div className="absolute left-1/2 top-0 grid h-10 w-10 -translate-x-1/2 place-items-center rounded-md border border-foreground/40 bg-card/40">
-                  <div className="h-0 w-0 border-l-[6px] border-r-[6px] border-b-[8px] border-l-transparent border-r-transparent border-b-foreground/70" />
+            <div className="flex h-32 w-32 shrink-0 items-center justify-center">
+              <div className="relative h-full w-full opacity-30">
+                <div className="absolute left-1/2 top-0 grid h-10 w-10 -translate-x-1/2 place-items-center rounded-t-lg border-2 border-foreground/50 bg-background/20">
+                  <ArrowUp className="h-5 w-5 shrink-0" />
                 </div>
-                {/* Left arrow */}
-                <div className="absolute left-0 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-md border border-foreground/40 bg-card/40">
-                  <div className="h-0 w-0 border-t-[6px] border-b-[6px] border-r-[8px] border-t-transparent border-b-transparent border-r-foreground/70" />
+                <div className="absolute left-0 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-l-lg border-2 border-foreground/50 bg-background/20">
+                  <ArrowLeft className="h-5 w-5 shrink-0" />
                 </div>
-                {/* Right arrow */}
-                <div className="absolute right-0 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-md border border-foreground/40 bg-card/40">
-                  <div className="h-0 w-0 border-t-[6px] border-b-[6px] border-l-[8px] border-t-transparent border-b-transparent border-l-foreground/70" />
+                <div className="absolute right-0 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-r-lg border-2 border-foreground/50 bg-background/20">
+                  <ArrowRight className="h-5 w-5 shrink-0" />
                 </div>
-                {/* Down arrow */}
-                <div className="absolute bottom-0 left-1/2 grid h-10 w-10 -translate-x-1/2 place-items-center rounded-md border border-foreground/40 bg-card/40">
-                  <div className="h-0 w-0 border-l-[6px] border-r-[6px] border-t-[8px] border-l-transparent border-r-transparent border-t-foreground/70" />
+                <div className="absolute bottom-0 left-1/2 grid h-10 w-10 -translate-x-1/2 place-items-center rounded-b-lg border-2 border-foreground/50 bg-background/20">
+                  <ArrowDown className="h-5 w-5 shrink-0" />
                 </div>
-                {/* Center badge with bonus count */}
-                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                  <div className="relative grid h-14 min-w-20 place-items-center rounded-full border-2 border-primary/60 bg-card px-3 text-xl font-bold tabular-nums text-foreground shadow-[0_0_18px_hsl(var(--primary)/0.35)]">
-                    {streakBonus.toLocaleString()}
-                    {scorePopup && (
-                      <span
-                        key={scorePopup.key}
-                        className="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap text-sm font-bold text-success animate-fade-in"
-                      >
-                        +{scorePopup.base}
-                        {scorePopup.bonus > 0 && (
-                          <span className="ml-1 text-warning">+{scorePopup.bonus} bonus</span>
-                        )}
-                      </span>
-                    )}
-                  </div>
-                </div>
+                <div className="absolute left-1/2 top-1/2 h-6 w-6 -translate-x-1/2 -translate-y-1/2 rounded-full bg-background/30" />
               </div>
             </div>
 
-            {/* Right — D (Right) */}
-            <div className="col-start-3 row-start-2 w-full text-left">
+            <div className="w-[360px] text-left">
               <AnswerChoice
                 letter="D"
                 text={currentQuestion.choices[3]}
@@ -444,8 +428,7 @@ const Question = () => {
               />
             </div>
 
-            {/* Bottom — C (Down) */}
-            <div className="col-start-2 row-start-3 w-full text-center">
+            <div className="col-span-3 w-[420px] text-center">
               <AnswerChoice
                 letter="C"
                 text={currentQuestion.choices[2]}
