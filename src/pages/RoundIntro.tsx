@@ -1,9 +1,11 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { GameState } from '@/types/game';
+import { GameState, Question as QuestionType } from '@/types/game';
 import { audioManager } from '@/utils/audioManager';
+import { selectQuestions } from '@/utils/questionSelector';
 
 const DURATION_MS = 5000;
+const QUESTION_POOL_SIZE = 30;
 
 const FIRST_ROUND_MESSAGES = [
   "Here we go. Easy ones first.",
@@ -44,10 +46,65 @@ const RoundIntro = () => {
     return pickRandom(isFirstRound ? FIRST_ROUND_MESSAGES : TAUNT_MESSAGES);
   }, [gameState]);
 
+  const preloadedRef = useRef<QuestionType[] | null>(null);
+  const timerDoneRef = useRef(false);
+  const navigatedRef = useRef(false);
+  const [, forceTick] = useState(0);
+
+  const tryNavigate = () => {
+    if (navigatedRef.current) return;
+    if (!gameState) {
+      navigate('/');
+      navigatedRef.current = true;
+      return;
+    }
+    if (timerDoneRef.current && preloadedRef.current) {
+      navigatedRef.current = true;
+      navigate('/question', {
+        state: { gameState, preloadedQuestions: preloadedRef.current },
+      });
+    }
+  };
+
   useEffect(() => {
     audioManager.playTrack('intro', '/round-start.mp3', { volume: 0.5, durationMs: 700 });
-    // Intentionally do NOT stop the intro track on unmount — Question.tsx
-    // will crossfade it out into the question loop for a seamless handoff.
+  }, []);
+
+  // Preload questions in parallel with the timer
+  useEffect(() => {
+    if (!gameState) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const questions = await selectQuestions(
+          gameState.category || 'All',
+          QUESTION_POOL_SIZE,
+          gameState.currentRound,
+          gameState.usedQuestionIds || []
+        );
+        if (cancelled) return;
+        preloadedRef.current = questions;
+        forceTick((n) => n + 1);
+        tryNavigate();
+      } catch (err) {
+        console.error('Failed to preload questions:', err);
+        if (!cancelled) navigate('/');
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Timer
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      timerDoneRef.current = true;
+      tryNavigate();
+    }, DURATION_MS);
+    return () => clearTimeout(timeout);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleStart = () => {
@@ -55,14 +112,9 @@ const RoundIntro = () => {
       navigate('/');
       return;
     }
-    navigate('/question', { state: { gameState } });
+    timerDoneRef.current = true;
+    tryNavigate();
   };
-
-  useEffect(() => {
-    const timeout = setTimeout(handleStart, DURATION_MS);
-    return () => clearTimeout(timeout);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
