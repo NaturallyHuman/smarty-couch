@@ -218,10 +218,16 @@ const Question = () => {
         ...prev,
         [currentQuestion.category]: (prev[currentQuestion.category] || 0) + 1,
       }));
+      setScorePopup({ base: breakdown.base, bonus: breakdown.streak, key: Date.now() });
     } else {
       incorrectSoundRef.current?.play().catch(() => {});
       if (incorrectSoundRef.current) incorrectSoundRef.current.currentTime = 0;
+      const hadStreak = streak >= 2;
       setStreak(0);
+      if (hadStreak) {
+        setStreakLostFlash(true);
+        setTimeout(() => setStreakLostFlash(false), 700);
+      }
     }
 
     feedbackTimeoutRef.current = setTimeout(() => {
