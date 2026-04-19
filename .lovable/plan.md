@@ -1,90 +1,49 @@
 
-Big update — five connected changes. Here's the plan.
+User wants a redesigned `GameOver` screen with a clear visual hierarchy: celebration → score → tier name → percentile → tier ladder with progress → key stats row → action buttons.
 
-## 1. Streak bonus scoring (escalating)
+## Plan
 
-Replace the current scoring (base + timer + flat streak multiplier) with a simpler, escalating model the user described:
+**File: `src/pages/GameOver.tsx`** — full rewrite of the layout (keep data sources/effects).
 
-- Every correct answer = **100 points** (base).
-- Streak bonuses kick in at **3 in a row** and grow each additional correct answer:
-  - 3-in-a-row: +50
-  - 4-in-a-row: +100
-  - 5-in-a-row: +200
-  - 6-in-a-row: +400
-  - 7+: +800 (caps to keep numbers sane)
-- Wrong answer / timeout resets the streak to 0.
-- Drop the timer bonus (no per-question timer anymore — see #2).
+### Layout (top → bottom, centered)
 
-File: `src/utils/scoring.ts` — rewrite `calculateScore` with the new schedule.
+1. **Celebration burst** — subtle CSS confetti/glow behind the title. Pure CSS (radial gradient + animated pulse), no library. Fades in on mount.
+2. **"QUIZ COMPLETE"** — small uppercase tracked label.
+3. **Big score** — `4,850` style, huge tabular numerals, primary color, scale-in animation.
+4. **Tier name** — e.g. "Quick Thinker", computed from final score.
+5. **Percentile line** — "Top X% of your runs" calculated from `recentScores` (rank current score against history).
+6. **Tier ladder** — 5 pills horizontally: `Warm-Up · Sharp Guess · Quick Thinker · Fact Machine · Trivia Titan`. Current tier highlighted (primary bg + scale-up). Connecting line between them. Small caret/arrow under the active one.
+7. **"X pts to next rank"** — distance to next tier threshold (or "Max rank!" at top).
+8. **Stats row** — 3 inline stats: `Accuracy 78%` · `Best streak 9` · `Best category Science`. Separated by dots/dividers.
+9. **Action buttons** — `Play Again` (primary, focused by default) and `Home` (secondary). Both navigate to `/`.
 
-## 2. One-minute round (answer as many as you can)
+### Tier system (new, in same file)
 
-Each round becomes a **60-second sprint**. Players answer questions back-to-back; the round ends when the timer hits zero, not after N questions.
+```
+0       → Warm-Up
+1500    → Sharp Guess
+3000    → Quick Thinker
+5000    → Fact Machine
+8000    → Trivia Titan
+```
+Helpers: `getTier(score)`, `getNextTierThreshold(score)`.
 
-Changes in `src/pages/Question.tsx`:
-- Replace per-question timer (`QUESTION_TIME = 10`) with a single round-level timer (`ROUND_TIME = 60`).
-- Remove `QUESTIONS_PER_ROUND = 10`. Instead, fetch a large pool (e.g. 30) up front so we never run out mid-round, and just keep advancing through them.
-- Timer bar (`TimerBar`) reflects the **round** countdown, not the question. It starts full at the beginning of the round and drains continuously across questions — no reset between questions.
-- When the player answers (correct or wrong), show feedback briefly (~600ms — shorter than today's 1200ms so the sprint feels snappy) then auto-advance to the next question.
-- Wrong answer no longer ends the question with a long pause; just flash red, reset streak, move on.
-- When the 60s timer hits zero, end the round (same flow as today's "last question answered").
-- Remove the per-question timeout logic; the round timer handles end-of-round.
+### Cut from current screen
+Remove the category breakdown card, last-10 bar chart, and awards grid. The new layout absorbs the essentials (best category, best streak, percentile-as-comparison) into a single clean line. Other utilities (`awards.ts`, `recentScores`) stay in place — just not rendered here. (If you want awards/history kept somewhere, say so and I'll add a "more details" toggle.)
 
-`TimerBar` already accepts `timeRemaining` / `maxTime` and animates smoothly — we just feed it the round timer and stop using `key={currentIndex}` (which currently forces a reset between questions).
+### Data sources (unchanged)
+- `gameState.players[0]` for score, accuracy, streak, category breakdown.
+- `recordGameScore(finalScore)` still called once on mount.
+- `recentScores` used for percentile calc instead of bar chart.
 
-## 3. Category breakdown on results screen
+### Styling notes
+- Use existing tokens (`text-primary`, `bg-card`, `text-muted-foreground`, `text-success`).
+- Tier pills: `rounded-full px-3 py-1 text-sm`, active pill `bg-primary text-primary-foreground scale-110`, others `bg-muted text-muted-foreground`. Connector: thin horizontal line behind pills.
+- Score uses `text-7xl font-bold tabular-nums text-primary animate-scale-in`.
+- Confetti = CSS-only: a few absolutely-positioned dots with `animate-pulse` at varied delays + a soft radial-gradient glow behind the title.
+- Two `TVButton`s side-by-side; D-pad lands on Play Again first.
 
-End-of-game screen needs a per-category breakdown plus strongest/weakest highlighted.
+### Files touched
+- `src/pages/GameOver.tsx` only.
 
-- Track per-category **correct + attempted** during the round (we already track `correctByCategory`; add an `attemptedByCategory` counter alongside it).
-- Pass both into `GameOver` (or a new results screen) via `gameState` / location state.
-- Render a list:
-  - Each category: correct / attempted (e.g. "Movies — 4 / 6, 67%")
-  - Highlight the strongest (highest accuracy, min 2 attempts) in green
-  - Highlight the weakest in red
-
-File: `src/pages/GameOver.tsx` — expand layout to include the breakdown section.
-
-## 4. Last 10 scores history
-
-Persist a rolling list of the player's last 10 game scores so they can compare.
-
-- Extend `LifetimeStats` in `src/types/game.ts`: add `recentScores: number[]` (newest first, max length 10).
-- Update `src/utils/lifetimeStats.ts` so `updateLifetimeStats` (or a new `recordGameScore`) prepends the new total and trims to 10.
-- On `GameOver`, show a small list/bar chart of the last 10 scores. The current game's score is highlighted. Above/below average is visually obvious (e.g. taller bars = higher score).
-
-## 5. Random silly awards
-
-At game end, award the player 1–3 randomly chosen humorous "achievements" based on their actual play data, plus pure-random gag awards.
-
-New file: `src/utils/awards.ts` exporting a list like:
-
-- "🛋️ Couch Potato Champion" — always eligible
-- "🐢 Slow and Steady" — answered fewer than 8 questions
-- "⚡ Caffeinated" — answered 20+ questions
-- "🎯 Sniper" — accuracy ≥ 80%
-- "🎲 Lucky Guesser" — accuracy 25–40%
-- "🔥 On Fire" — max streak ≥ 5
-- "🧊 Ice Cold" — got 3 wrong in a row at any point
-- "🦉 Night Owl" — played after 10pm local time
-- "🎭 Drama Queen" — finished with a wrong answer
-- "🏆 Self-Proclaimed Genius" — score above their personal best
-- Plus pure-gag random ones: "🐸 Frog Whisperer", "🥔 Mashed Potato Enthusiast", "👑 King of the Remote", "🛸 Probably an Alien"
-
-Pick 2–3 to display on `GameOver`. Mix one earned (based on stats) + one random gag for variety.
-
-## Files touched
-
-- `src/types/game.ts` — add `recentScores`, `attemptedByCategory`, simplify `RoundResult` if needed
-- `src/utils/scoring.ts` — new escalating streak schedule, drop timer bonus
-- `src/utils/lifetimeStats.ts` — record recent scores
-- `src/utils/awards.ts` — **new**, award pool + picker
-- `src/pages/Question.tsx` — round-level 60s timer, no per-question count cap, faster feedback, track attempted-by-category
-- `src/pages/GameOver.tsx` — category breakdown, strongest/weakest, last-10-scores chart, silly awards
-- `src/components/TimerBar.tsx` — minor: ensure it animates smoothly across the full minute (no key reset)
-
-## Notes / decisions made
-
-- **Default mode is solo** (per recent change). The new GameOver layout is designed for solo; two-player mode still works but shows one combined breakdown — we can split it later if you ever bring two-player back to the main flow.
-- **Round count**: with 60-second rounds, keeping 3 rounds total means ~3 minutes of play. That feels right. If you want fewer/more rounds, easy to tweak.
-- **Difficulty still escalates per round** (easy → medium → hard) via existing `getDifficultyForRound`. No change there.
+No new dependencies. No type changes. Routing unchanged.
