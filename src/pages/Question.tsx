@@ -321,7 +321,7 @@ const Question = () => {
           <TimerBar
             timeRemaining={timeRemaining}
             maxTime={ROUND_TIME}
-            questionNumber={attemptedCount + 1}
+            score={score}
           />
         </div>
 
