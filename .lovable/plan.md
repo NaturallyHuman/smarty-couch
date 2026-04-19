@@ -1,36 +1,27 @@
 
-Two changes in `src/pages/Question.tsx`, plus a logic verification.
+The top/bottom answers ("German proposal for Mexico to attack the US") wrap awkwardly because they're constrained to the center column (140px wide) of the D-pad grid. Left/right answers don't have this issue.
 
-## 1. Center D-pad badge → live streak counter
+## Fix in `src/pages/Question.tsx`
 
-- Replace `{streakBonus.toLocaleString()}` with `{streak}` so the badge shows the current streak (0, 1, 2, 3…).
-- On wrong answers `streak` is already reset to 0 in `handleAnswer`, so the badge will naturally drop to 0.
-- Keep the `scorePopup` floating animation above the badge unchanged — players still see `+100 / +bonus` feedback.
+**1. Let top/bottom answers span beyond the center column**
+Currently the top (A) and bottom (C) answer cells are placed at `col-start-2` (the narrow 140px D-pad column). Move them to span all three columns so they can use the full row width:
+- Top (A): `col-start-1 col-span-3` instead of `col-start-2`
+- Bottom (C): `col-start-1 col-span-3` instead of `col-start-2`
 
-## 2. Remove purple border around badge
+This lets the text breathe horizontally and stay on a single line in most cases.
 
-- Strip `border-2 border-primary/60` and the purple glow `shadow-[0_0_18px_hsl(var(--primary)/0.35)]` from the badge wrapper.
-- Keep the `bg-card` fill and rounded shape so it still reads as a centered chip, just neutral instead of purple-ringed.
+**2. Prevent unnecessary wrapping on all answers**
+On the four AnswerChoice wrappers, swap `text-center`/`text-left`/`text-right` divs to allow inline behavior, and apply `whitespace-nowrap` to the button text in `src/components/AnswerChoice.tsx` only when text fits — but since some answers genuinely are long, use a softer approach:
+- Add `whitespace-nowrap` to `AnswerChoice` button by default so short/medium text stays on one line.
+- For very long answers that truly exceed available width, allow wrap by using `whitespace-nowrap` only at a min character threshold won't work cleanly in pure CSS. Simpler: keep `whitespace-nowrap` always — if text overflows the grid cell, it'll just push, but with the wider top/bottom row from change #1 this should rarely happen.
 
-## 3. Cross-round score persistence (verification)
+Refined approach: use `whitespace-normal` (default) but increase available width via #1, AND set `min-width: 0` isn't needed. The real fix is just #1 — giving top/bottom enough horizontal space. Adding `whitespace-nowrap` is a belt-and-suspenders for short answers.
 
-Reviewed the round-end flow in `Question.tsx` + how state seeds on mount:
-
-- On mount: `setScore(gameState.currentRoundScore)` — seeds from `gameState`, which is reset to `0` by `handleRoundEnd` before navigating. So each round's local `score` starts at 0. ✓ (intended — round score, not cumulative)
-- On round end: `currentPlayer.totalScore += score` — the round's score is added to the player's running `totalScore`. ✓
-- The top-right pill in `TimerBar` is fed `score={score}` — i.e. **current round score**, not total. This is consistent within a round but resets visually between rounds.
-
-The user says the upper-right number "should remain consistent across all three rounds." Two valid interpretations:
-- **(a)** It should display the **cumulative total score across rounds** (round 2 starts where round 1 ended).
-- **(b)** It should just *behave consistently* (same logic, same display) round to round — which it already does.
-
-Given the wording ("remain consistent across all three rounds"), I'm reading this as **(a)**: the upper-right number should be the player's running total, not just the current round's score. Fix:
-
-- Change the `TimerBar` score prop to `gameState.players[gameState.currentPlayer].totalScore + score` so it shows previous rounds' accumulated total plus what's been earned this round. Round-to-round it grows monotonically; on round end the round's `score` flushes into `totalScore` and the new round starts adding from there — visually seamless.
-
-If the user actually meant (b), this still works: the number will still be consistent (and now also more meaningful).
+**3. Keep grid alignment intact**
+The center D-pad cell stays at `col-start-2 row-start-2`. Left/right answers stay in their columns. Only the top/bottom cells expand to span all 3 columns, but they remain visually centered (text-center) so they read as flanking the D-pad vertically.
 
 ## Files touched
-- `src/pages/Question.tsx` — badge content swap, badge styling trim, TimerBar `score` prop changed to cumulative.
+- `src/pages/Question.tsx` — change `col-start-2` → `col-start-1 col-span-3` on top (row-start-1) and bottom (row-start-3) answer cells.
+- `src/components/AnswerChoice.tsx` — add `whitespace-nowrap` to the button so short answers don't wrap when they don't need to. Long answers will still flow naturally because the wider span gives them room.
 
-No scoring math changes. No other files.
+No logic changes. No layout regressions for left/right answers.
