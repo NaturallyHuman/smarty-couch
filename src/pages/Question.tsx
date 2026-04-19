@@ -322,9 +322,25 @@ const Question = () => {
 
         <div className="mb-2 flex items-center justify-center gap-6 text-base">
           <span className="text-primary">{currentQuestion.category}</span>
-          <span className="text-muted-foreground">Score: <span className="font-bold text-foreground">{score.toLocaleString()}</span></span>
-          {streak >= 2 && (
+          <span className="relative text-muted-foreground">
+            Score: <span className="font-bold text-foreground">{score.toLocaleString()}</span>
+            {scorePopup && (
+              <span
+                key={scorePopup.key}
+                className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-sm font-bold text-success animate-fade-in"
+              >
+                +{scorePopup.base}
+                {scorePopup.bonus > 0 && (
+                  <span className="ml-1 text-warning">+{scorePopup.bonus} bonus</span>
+                )}
+              </span>
+            )}
+          </span>
+          {streak >= 2 && !streakLostFlash && (
             <span className="text-warning font-bold">🔥 {streak} streak</span>
+          )}
+          {streakLostFlash && (
+            <span className="font-bold text-destructive animate-fade-in">💔 Streak lost</span>
           )}
         </div>
 
