@@ -5,10 +5,10 @@ import { Hourglass } from 'lucide-react';
 interface TimerBarProps {
   timeRemaining: number;
   maxTime: number;
-  questionNumber?: number;
+  score?: number;
 }
 
-export const TimerBar = ({ timeRemaining, maxTime, questionNumber }: TimerBarProps) => {
+export const TimerBar = ({ timeRemaining, maxTime, score }: TimerBarProps) => {
   const percentage = (timeRemaining / maxTime) * 100;
   const isLow = timeRemaining <= 5;
 
