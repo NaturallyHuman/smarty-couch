@@ -56,6 +56,36 @@ const Question = () => {
       return;
     }
 
+    const initWithQuestions = (selected: QuestionType[]) => {
+      setQuestions(selected);
+      const baseTotal = (gameState.players[gameState.currentPlayer]?.totalScore || 0);
+      roundStartScoreRef.current = baseTotal + gameState.currentRoundScore;
+      setScore(baseTotal + gameState.currentRoundScore);
+      setStreak(gameState.currentStreak);
+      setMaxStreak(gameState.currentMaxStreak);
+      setCorrectCount(gameState.currentRoundCorrect);
+
+      audioManager.crossfade('intro', 'question', '/question-music.mp3', {
+        volume: 0.35,
+        loop: true,
+        durationMs: 1200,
+      });
+
+      if (!correctSoundRef.current) {
+        correctSoundRef.current = new Audio('/correct.mp3');
+        correctSoundRef.current.volume = 0.6;
+      }
+      if (!incorrectSoundRef.current) {
+        incorrectSoundRef.current = new Audio('/incorrect.mp3');
+        incorrectSoundRef.current.volume = 0.6;
+      }
+    };
+
+    if (preloadedQuestions && preloadedQuestions.length > 0) {
+      initWithQuestions(preloadedQuestions);
+      return;
+    }
+
     const fetchQuestions = async () => {
       try {
         const selected = await selectQuestions(
@@ -64,28 +94,7 @@ const Question = () => {
           gameState.currentRound,
           gameState.usedQuestionIds || []
         );
-        setQuestions(selected);
-        const baseTotal = (gameState.players[gameState.currentPlayer]?.totalScore || 0);
-        roundStartScoreRef.current = baseTotal + gameState.currentRoundScore;
-        setScore(baseTotal + gameState.currentRoundScore);
-        setStreak(gameState.currentStreak);
-        setMaxStreak(gameState.currentMaxStreak);
-        setCorrectCount(gameState.currentRoundCorrect);
-
-        audioManager.crossfade('intro', 'question', '/question-music.mp3', {
-          volume: 0.35,
-          loop: true,
-          durationMs: 1200,
-        });
-
-        if (!correctSoundRef.current) {
-          correctSoundRef.current = new Audio('/correct.mp3');
-          correctSoundRef.current.volume = 0.6;
-        }
-        if (!incorrectSoundRef.current) {
-          incorrectSoundRef.current = new Audio('/incorrect.mp3');
-          incorrectSoundRef.current.volume = 0.6;
-        }
+        initWithQuestions(selected);
       } catch (error) {
         console.error('Error fetching questions:', error);
         navigate('/');
