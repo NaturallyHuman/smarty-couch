@@ -327,20 +327,6 @@ const Question = () => {
 
         <div className="mb-3 flex items-center justify-center gap-6 text-base">
           <span className="text-primary">{currentQuestion.category}</span>
-          <span className="relative text-muted-foreground">
-            Score: <span className="font-bold text-foreground">{score.toLocaleString()}</span>
-            {scorePopup && (
-              <span
-                key={scorePopup.key}
-                className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-sm font-bold text-success animate-fade-in"
-              >
-                +{scorePopup.base}
-                {scorePopup.bonus > 0 && (
-                  <span className="ml-1 text-warning">+{scorePopup.bonus} bonus</span>
-                )}
-              </span>
-            )}
-          </span>
           {streak >= 2 && !streakLostFlash && (
             <span className="text-warning font-bold">🔥 {streak} streak</span>
           )}
@@ -420,9 +406,22 @@ const Question = () => {
                 <div className="absolute bottom-0 left-1/2 grid h-10 w-10 -translate-x-1/2 place-items-center rounded-md border border-foreground/40 bg-card/40">
                   <div className="h-0 w-0 border-l-[6px] border-r-[6px] border-t-[8px] border-l-transparent border-r-transparent border-t-foreground/70" />
                 </div>
-                {/* Center badge with question number */}
-                <div className="absolute left-1/2 top-1/2 grid h-14 w-14 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-2 border-primary/60 bg-card text-xl font-bold tabular-nums text-foreground shadow-[0_0_18px_hsl(var(--primary)/0.35)]">
-                  {attemptedCount + 1}
+                {/* Center badge with live score */}
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                  <div className="relative grid h-14 min-w-20 place-items-center rounded-full border-2 border-primary/60 bg-card px-3 text-xl font-bold tabular-nums text-foreground shadow-[0_0_18px_hsl(var(--primary)/0.35)]">
+                    {score.toLocaleString()}
+                    {scorePopup && (
+                      <span
+                        key={scorePopup.key}
+                        className="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap text-sm font-bold text-success animate-fade-in"
+                      >
+                        +{scorePopup.base}
+                        {scorePopup.bonus > 0 && (
+                          <span className="ml-1 text-warning">+{scorePopup.bonus} bonus</span>
+                        )}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
