@@ -1,21 +1,22 @@
 
-Small, contained change to `src/pages/Question.tsx`.
+Two tweaks across two files.
 
-## Changes
+## 1. `src/components/TimerBar.tsx`
+- Rename the optional prop from `questionNumber` to `score` (number). Render it the same way (pill, top-right of TimerBar row, large tabular-nums) — just no label, just the number, formatted with `toLocaleString()` so 4-digit scores look right. Bump `min-w` slightly so 4–5 digit numbers fit.
 
-**1. Remove the score block from the header row**
-The middle of the header currently shows `Score: 4,850` plus the floating `+100 / +50 bonus` popup. Remove the whole `<span>` containing "Score:" and its popup. Keep category on the left and streak/streak-lost flash on the right.
+## 2. `src/pages/Question.tsx`
+- Pass `score={score}` to `<TimerBar>` instead of `questionNumber`.
+- In the center D-pad badge, replace `score.toLocaleString()` with the **bonus count** (`streakBonus.toLocaleString()` — the running total of streak bonus points earned this round, already tracked in state).
+- Keep the existing `scorePopup` floating animation above the badge so players still see `+100 / +50 bonus` feedback when they answer. The popup stays anchored to the center badge.
+- Header row (category + streak indicator) stays as-is.
 
-**2. Replace the question-number badge (center of D-pad) with the live score**
-Currently the D-pad center circle shows `attemptedCount + 1`. Swap it to show `score.toLocaleString()` — no label, just the number. Make the badge slightly wider so 4-digit scores fit comfortably (e.g., `min-w-20 px-3` instead of fixed `w-14`).
-
-**3. Move the score popup to the badge**
-Re-anchor the floating `+100 (+50 bonus)` popup so it pops out of the center badge instead of the removed header score. Same animation, same colors — just a new parent.
-
-**4. Question counter**
-The TimerBar already shows `questionNumber` in its own pill (top of screen), so removing it from the center is fine — the count is still visible up top.
+## Notes
+- `streakBonus` is already accumulated in the `handleAnswer` correct branch (`setStreakBonus((prev) => prev + breakdown.streak)`), so no scoring logic changes — just surfacing it.
+- It resets to 0 implicitly each round because the component remounts on round transition (state reinitializes).
+- The question counter visible up top is removed by this change. The user explicitly asked for score there instead, so that's intentional.
 
 ## Files touched
-- `src/pages/Question.tsx` — header row trim, center badge swap, popup re-parent.
+- `src/components/TimerBar.tsx` — rename prop, format with `toLocaleString`, widen pill.
+- `src/pages/Question.tsx` — swap TimerBar prop; swap center badge to show `streakBonus`.
 
-No other files, no new dependencies, no logic changes to scoring.
+No other files, no new dependencies.
