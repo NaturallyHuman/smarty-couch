@@ -1,49 +1,37 @@
 
-User wants a redesigned `GameOver` screen with a clear visual hierarchy: celebration → score → tier name → percentile → tier ladder with progress → key stats row → action buttons.
+Quick read of current behavior in `src/pages/Question.tsx`:
+
+- `score` only ever **increases** by `points` on a correct answer. It's never reset on a wrong answer.
+- What does reset on a wrong answer is `streak` → 0, which kills future streak bonuses until the player builds it back up.
+
+So the actual score (cumulative points from correct answers) already does **not** reset on a wrong answer. The thing that "resets" is the streak bonus pipeline, which is the intended behavior the user is describing.
+
+There's one thing worth confirming though: `streakBonus` state exists in `Question.tsx` but I don't see it displayed anywhere on the question screen (it's tracked but unused visually). And the round score, total score, etc. all behave correctly.
+
+## Likely what the user is actually seeing
+
+The user thinks the score resets on a wrong answer. Two possibilities:
+
+1. **The streak counter visibly disappears** ("🔥 5 streak" vanishes when they get one wrong) and they're reading that as "score reset."
+2. **The displayed score genuinely looks like it dropped** — which would only happen if there's a rendering bug.
+
+Looking at the code carefully: `setScore((prev) => prev + points)` only runs on correct. On wrong, score is untouched. So there's no actual reset bug.
 
 ## Plan
 
-**File: `src/pages/GameOver.tsx`** — full rewrite of the layout (keep data sources/effects).
+Since the underlying behavior is already correct, the fix is **clarity, not logic**. Make it visually obvious that the score is preserved and only the streak/bonus is lost:
 
-### Layout (top → bottom, centered)
+**File: `src/pages/Question.tsx`**
 
-1. **Celebration burst** — subtle CSS confetti/glow behind the title. Pure CSS (radial gradient + animated pulse), no library. Fades in on mount.
-2. **"QUIZ COMPLETE"** — small uppercase tracked label.
-3. **Big score** — `4,850` style, huge tabular numerals, primary color, scale-in animation.
-4. **Tier name** — e.g. "Quick Thinker", computed from final score.
-5. **Percentile line** — "Top X% of your runs" calculated from `recentScores` (rank current score against history).
-6. **Tier ladder** — 5 pills horizontally: `Warm-Up · Sharp Guess · Quick Thinker · Fact Machine · Trivia Titan`. Current tier highlighted (primary bg + scale-up). Connecting line between them. Small caret/arrow under the active one.
-7. **"X pts to next rank"** — distance to next tier threshold (or "Max rank!" at top).
-8. **Stats row** — 3 inline stats: `Accuracy 78%` · `Best streak 9` · `Best category Science`. Separated by dots/dividers.
-9. **Action buttons** — `Play Again` (primary, focused by default) and `Home` (secondary). Both navigate to `/`.
+1. **Keep the score display permanent and stable** — it already is, no change needed.
+2. **On a wrong answer, briefly show a "Streak lost" flash** in place of the streak indicator (e.g., "💔 Streak lost" for ~600ms) so the player understands what just reset. Then it disappears until they build a new streak ≥2.
+3. **Add a subtle "+100 +50 bonus" floating popup** near the score when a correct answer with bonus is awarded, so players feel the bonus mechanic clearly (this also makes it obvious the bonus is the *only* thing tied to the streak).
 
-### Tier system (new, in same file)
+That's it — no scoring math changes, just visual reinforcement that score is permanent and only streak bonuses are at risk.
 
-```
-0       → Warm-Up
-1500    → Sharp Guess
-3000    → Quick Thinker
-5000    → Fact Machine
-8000    → Trivia Titan
-```
-Helpers: `getTier(score)`, `getNextTierThreshold(score)`.
+If the user is reporting an actual bug where the score number drops on wrong answers, I'd need a repro (it doesn't happen in the current code). I'll flag that in my response so they can confirm.
 
-### Cut from current screen
-Remove the category breakdown card, last-10 bar chart, and awards grid. The new layout absorbs the essentials (best category, best streak, percentile-as-comparison) into a single clean line. Other utilities (`awards.ts`, `recentScores`) stay in place — just not rendered here. (If you want awards/history kept somewhere, say so and I'll add a "more details" toggle.)
+## Files touched
+- `src/pages/Question.tsx` — add streak-lost flash + optional score popup on bonus.
 
-### Data sources (unchanged)
-- `gameState.players[0]` for score, accuracy, streak, category breakdown.
-- `recordGameScore(finalScore)` still called once on mount.
-- `recentScores` used for percentile calc instead of bar chart.
-
-### Styling notes
-- Use existing tokens (`text-primary`, `bg-card`, `text-muted-foreground`, `text-success`).
-- Tier pills: `rounded-full px-3 py-1 text-sm`, active pill `bg-primary text-primary-foreground scale-110`, others `bg-muted text-muted-foreground`. Connector: thin horizontal line behind pills.
-- Score uses `text-7xl font-bold tabular-nums text-primary animate-scale-in`.
-- Confetti = CSS-only: a few absolutely-positioned dots with `animate-pulse` at varied delays + a soft radial-gradient glow behind the title.
-- Two `TVButton`s side-by-side; D-pad lands on Play Again first.
-
-### Files touched
-- `src/pages/GameOver.tsx` only.
-
-No new dependencies. No type changes. Routing unchanged.
+No other files affected. No new dependencies.
