@@ -321,7 +321,7 @@ const Question = () => {
           <TimerBar
             timeRemaining={timeRemaining}
             maxTime={ROUND_TIME}
-            score={(gameState?.players[gameState.currentPlayer]?.totalScore ?? 0) + score}
+            score={score}
           />
         </div>
 
@@ -352,7 +352,7 @@ const Question = () => {
             }}
           >
             {/* Top — A (Up) */}
-            <div className="col-start-1 col-span-3 row-start-1 w-full text-center">
+            <div className="col-start-2 row-start-1 w-full text-center">
               <AnswerChoice
                 letter="A"
                 text={currentQuestion.choices[0]}
@@ -408,8 +408,8 @@ const Question = () => {
                 </div>
                 {/* Center badge with bonus count */}
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                  <div className="relative grid h-14 min-w-20 place-items-center rounded-full bg-card px-3 text-xl font-bold tabular-nums text-foreground">
-                    {streak}
+                  <div className="relative grid h-14 min-w-20 place-items-center rounded-full border-2 border-primary/60 bg-card px-3 text-xl font-bold tabular-nums text-foreground shadow-[0_0_18px_hsl(var(--primary)/0.35)]">
+                    {streakBonus.toLocaleString()}
                     {scorePopup && (
                       <span
                         key={scorePopup.key}
@@ -445,7 +445,7 @@ const Question = () => {
             </div>
 
             {/* Bottom — C (Down) */}
-            <div className="col-start-1 col-span-3 row-start-3 w-full text-center">
+            <div className="col-start-2 row-start-3 w-full text-center">
               <AnswerChoice
                 letter="C"
                 text={currentQuestion.choices[2]}

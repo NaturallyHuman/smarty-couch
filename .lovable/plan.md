@@ -1,57 +1,22 @@
 
-Restructure `src/pages/GameOver.tsx` to match the reference layout: big "Final Score" label + number at top, tier name centered in mid-upper area, and a 3-column stat row at the bottom (Best streak / Best category / Worst category). Use theme colors and clear visual hierarchy — no confetti dots, no tier ladder, no percentile, no "pts to next tier".
+Two tweaks across two files.
 
-## Layout (mirrors uploaded reference)
+## 1. `src/components/TimerBar.tsx`
+- Rename the optional prop from `questionNumber` to `score` (number). Render it the same way (pill, top-right of TimerBar row, large tabular-nums) — just no label, just the number, formatted with `toLocaleString()` so 4-digit scores look right. Bump `min-w` slightly so 4–5 digit numbers fit.
 
-```text
-                 Final Score          ← label, muted, small
-                   2,400              ← huge primary, tabular
+## 2. `src/pages/Question.tsx`
+- Pass `score={score}` to `<TimerBar>` instead of `questionNumber`.
+- In the center D-pad badge, replace `score.toLocaleString()` with the **bonus count** (`streakBonus.toLocaleString()` — the running total of streak bonus points earned this round, already tracked in state).
+- Keep the existing `scorePopup` floating animation above the badge so players still see `+100 / +50 bonus` feedback when they answer. The popup stays anchored to the center badge.
+- Header row (category + streak indicator) stays as-is.
 
-                Quick Thinker!        ← tier name, accent color
-
-   Best streak     Best category     Worst category    ← labels muted
-       8              History            Science       ← values, bold
-   2300 points!        9/9                3/9          ← sub-line muted
-
-              [ Play Again ]  [ Home ]
-```
-
-## Changes in `src/pages/GameOver.tsx`
-
-**1. Replace top section**
-- Drop celebration glow + confetti dots (cleaner, matches reference).
-- Keep "QUIZ COMPLETE" eyebrow (small, muted, tracked) — adds hierarchy without clutter.
-- "Final Score" label (text-lg, muted-foreground, font-medium).
-- Score number: text-8xl, font-bold, tabular-nums, `text-primary`, `animate-scale-in`.
-
-**2. Tier name (mid section)**
-- Centered, text-4xl, font-bold, `text-success` (or `text-primary` — pick `text-success` for color contrast vs the score). Add "!" suffix to match reference energy ("Quick Thinker!").
-- Margin top/bottom generous (~mb-16) to give the breathing room shown in the reference.
-
-**3. Three-column stat row**
-Replace the inline horizontal stats + tier ladder with a clean 3-col grid:
-- **Best streak** → value: `player.maxStreak`, sub-line: `${maxStreak * 100} points!` (approximation — or compute actual streak bonus if available). Looking at PlayerStats, there's no per-streak bonus total stored; simplest: show "{maxStreak * STREAK_BONUS_PER} points!" using the same constant as scoring, OR just "best run!" sub-line. **Decision**: use `${player.maxStreak * 100} points!` as a readable approximation matching reference's "2300 points!" vibe. (If exact value is preferred, we can wire `streakBonusTotal` through GameState later.)
-- **Best category** → value: existing `getBestCategory(player)` result, sub-line: `${correct}/${attempted}` from `correctByCategory` / `attemptedByCategory`.
-- **Worst category** → new helper `getWorstCategory(player)` mirroring `getBestCategory` but picking lowest accuracy (min 2 attempts). Sub-line: `${correct}/${attempted}`.
-
-Each column: muted label on top, large bold value middle (text-2xl, with best=success, worst=destructive for color coding), muted sub-line below.
-
-**4. Action buttons**
-- Keep `Play Again` (primary) + `Home` (secondary), centered at bottom with mt-12. Keep D-pad focus on Play Again.
-
-**5. Remove**
-- TIERS ladder rendering (keep `TIERS` array + `getTierIndex` for the tier name only).
-- Percentile line + recentScores tracking display (keep the recording call to `recordGameScore` so lifetime stats still update — just don't show percentile).
-- Confetti dots + celebration glow divs.
-- "pts to next tier" line.
-
-## Theme color usage
-- Score number: `text-primary`
-- Tier name: `text-success`
-- Best stat values: `text-foreground` with best category in `text-success`
-- Worst category value: `text-destructive`
-- All labels and sub-lines: `text-muted-foreground`
-- Buttons keep existing TVButton variants
+## Notes
+- `streakBonus` is already accumulated in the `handleAnswer` correct branch (`setStreakBonus((prev) => prev + breakdown.streak)`), so no scoring logic changes — just surfacing it.
+- It resets to 0 implicitly each round because the component remounts on round transition (state reinitializes).
+- The question counter visible up top is removed by this change. The user explicitly asked for score there instead, so that's intentional.
 
 ## Files touched
-- `src/pages/GameOver.tsx` — full layout rewrite per above. No new files, no scoring logic changes, no type changes.
+- `src/components/TimerBar.tsx` — rename prop, format with `toLocaleString`, widen pill.
+- `src/pages/Question.tsx` — swap TimerBar prop; swap center badge to show `streakBonus`.
+
+No other files, no new dependencies.
