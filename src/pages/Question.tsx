@@ -173,13 +173,13 @@ const Question = () => {
 
     // Merge category aggregates onto the player.
     const mergedCorrect = { ...(currentPlayer.correctByCategory || {}) };
-    Object.entries(correctByCategory).forEach(([k, v]) => {
+    Object.entries(correctByCategoryRef.current).forEach(([k, v]) => {
       mergedCorrect[k] = (mergedCorrect[k] || 0) + v;
     });
     currentPlayer.correctByCategory = mergedCorrect;
 
     const mergedAttempted = { ...(currentPlayer.attemptedByCategory || {}) };
-    Object.entries(attemptedByCategory).forEach(([k, v]) => {
+    Object.entries(attemptedByCategoryRef.current).forEach(([k, v]) => {
       mergedAttempted[k] = (mergedAttempted[k] || 0) + v;
     });
     currentPlayer.attemptedByCategory = mergedAttempted;
@@ -188,7 +188,7 @@ const Question = () => {
 
     const usedIds = [
       ...(gameState.usedQuestionIds || []),
-      ...questions.slice(0, currentIndex + 1).map((q) => q.id),
+      ...questions.slice(0, currentIndexRef.current + 1).map((q) => q.id),
     ];
 
     let nextPlayer = gameState.currentPlayer;
