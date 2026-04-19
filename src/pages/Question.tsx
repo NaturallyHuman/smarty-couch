@@ -20,6 +20,7 @@ const Question = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const gameState = location.state?.gameState as GameState;
+  const preloadedQuestions = location.state?.preloadedQuestions as QuestionType[] | undefined;
   const category = gameState?.category || 'All';
 
   const [questions, setQuestions] = useState<QuestionType[]>([]);
