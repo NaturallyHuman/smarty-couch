@@ -1,57 +1,31 @@
 
-Three changes, all small.
+## Bug found
 
-## 1. Preload questions during RoundIntro (skip "Loading questions…")
+The **GameOver screen shows zeros because the timer's round-end handler reads stale state via closure.**
 
-**File: `src/pages/RoundIntro.tsx`**
-- Call `selectQuestions(...)` on mount alongside the audio/timer.
-- Hold the fetched questions in a ref/state.
-- Pass them through to `/question` via `location.state`: `{ gameState, preloadedQuestions }`.
-- Edge cases:
-  - If the 5s timer fires before the fetch resolves, wait for the fetch (don't navigate yet) so we never land on the Question screen empty. Track with a `readyRef` + small effect that navigates as soon as both "timer done" and "questions loaded" are true.
-  - If fetch errors, navigate home (same as Question.tsx does today).
+In `Question.tsx`, the `setInterval` is created in a useEffect with deps `[questions.length, showPauseDialog]` — neither changes during a round. So the interval callback closes over the **initial render values** of `score`, `correctCount`, `attemptedCount`, `streakBonus`, `maxStreak`, `correctByCategory`, `attemptedByCategory` — all `0` / `{}`.
 
-**File: `src/pages/Question.tsx`**
-- If `location.state.preloadedQuestions` is present, skip the fetch and use them directly.
-- Keep the existing fetch path as fallback (in case Question is reached without preload, e.g. dev nav).
-- The "Loading questions…" branch becomes effectively unreachable in the normal flow, but stays as a safety net.
+When the 60s timer expires → calls `handleRoundEnd()` → `roundDelta = score(0) - roundStartScoreRef(0) = 0` → `currentPlayer.totalScore += 0`. Same for `correctAnswers`, `streakBonusTotal`, category maps. Every round contributes 0. GameOver renders 0 score, no category data → Best/Worst category columns hide → "wrong layout" with just an empty "Best streak: 0, 0 points!" column.
 
-## 2. Replace timer countdown number with hourglass icon
+When the round previously ended via `moveToNext` (running out of questions), it worked because `moveToNext` was called from the click/key handler which has fresh closures. The timer expiring is the broken path.
 
-**File: `src/components/TimerBar.tsx`**
-- Remove the `{timeRemaining}` numeric span on the left.
-- Replace with `<Hourglass />` from `lucide-react` (`h-6 w-6`, muted color normally, `text-destructive animate-pulse` when `isLow`).
-- Keep the bar itself unchanged structurally — direction change handled in step 3.
+(The "wrong layout" complaint is a downstream symptom — the layout itself matches the approved mockup, but with zero data the category columns hide and only a single sparse "Best streak" column shows, which looks broken.)
 
-## 3. Move score to upper right + reverse progress bar direction
+## Fix — `src/pages/Question.tsx`
 
-**Score relocation — `src/pages/Question.tsx`:**
-- Wrap the existing TimerBar row so it becomes a single horizontal row:
-  ```
-  [hourglass] [============ progress bar ============] [score]
-  ```
-- Remove the centered "Score:" label/strip below the bar.
-- Score shows just the number (`{score.toLocaleString()}`) in `font-bold text-foreground tabular-nums text-2xl`, no "Score:" prefix.
-- Streak indicator + score popup move with the score (right side, stacked or inline beside it). Keep the popup absolute-positioned relative to the score number.
-- Category name stays where it is (centered above the question) OR moves to a small line below — keeping it centered above question for now since user didn't ask to move it.
+1. **Mirror live state into refs** so `handleRoundEnd` always reads current values:
+   - `scoreRef`, `correctCountRef`, `attemptedCountRef`, `maxStreakRef`, `streakBonusRef`, `correctByCategoryRef`, `attemptedByCategoryRef`, `currentIndexRef`, `lastWasWrongRef` (already exists).
+   - Update each ref in a small `useEffect` that watches its corresponding state value.
 
-**Reverse bar animation — `src/components/TimerBar.tsx`:**
-- Currently the filled portion shrinks from right to left as time drains (width goes 100% → 0%, anchored left).
-- "Reverse direction" = the bar should drain from the **left** instead (filled portion shrinks toward the right, or equivalently the empty portion grows from the left).
-- Implementation: anchor the fill to the right edge using `ml-auto` on the inner div, so as `width` shrinks, it stays pinned right and the left side empties first.
+2. **Rewrite `handleRoundEnd` to read from refs** instead of closure variables. This makes it correct whether called from the timer, the key handler, or `moveToNext`.
 
-  ```tsx
-  <div className="h-3 flex-1 overflow-hidden rounded-full bg-secondary flex">
-    <div
-      className={cn('h-full ease-linear ml-auto', { ... })}
-      style={{ width: `${percentage}%` }}
-    />
-  </div>
-  ```
+3. **Decouple navigate from the setState updater** to silence the React warning and avoid render-phase navigation:
+   - Inside the timer's `setTimeRemaining` updater, just return `0` and set a `timeUpRef.current = true` flag (or just rely on `prev <= 1`).
+   - Add a separate `useEffect` watching `timeRemaining` — when it hits 0 and `roundEndedRef.current` is false, call `handleRoundEnd()`.
+
+4. **Keep all existing scoring logic intact** — only reading sources change. `roundStartScoreRef` and the cumulative-score init stay the same.
 
 ## Files touched
-- `src/pages/RoundIntro.tsx` — preload questions, navigate when both ready.
-- `src/pages/Question.tsx` — accept preloaded questions; new top row layout (hourglass + bar + score); remove old score strip.
-- `src/components/TimerBar.tsx` — swap number for Hourglass icon; right-anchor the fill so it drains left-first.
+- `src/pages/Question.tsx` — add refs that mirror state; refactor `handleRoundEnd` to read from refs; move timer-expiry navigation out of the setState updater into a `timeRemaining`-watching effect.
 
-No new dependencies (Hourglass is already in lucide-react). No type/route changes.
+No changes needed to `GameOver.tsx`, `RoundIntro.tsx`, types, or routing. Once real data flows through, the layout naturally fills in (Best streak with real bonus points, Best category, Worst category) exactly per the approved mockup.
