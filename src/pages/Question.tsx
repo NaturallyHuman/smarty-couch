@@ -331,19 +331,19 @@ const Question = () => {
   return (
     <>
       <div className="flex h-full w-full flex-col px-[5%] py-[3%]">
-        {/* Round-level Timer Bar — drains continuously across all questions */}
-        <div className="mb-4">
-          <TimerBar timeRemaining={timeRemaining} maxTime={ROUND_TIME} />
-        </div>
-
-        <div className="mb-2 flex items-center justify-center gap-6 text-base">
-          <span className="text-primary">{currentQuestion.category}</span>
-          <span className="relative text-muted-foreground">
-            Score: <span className="font-bold text-foreground">{score.toLocaleString()}</span>
+        {/* Top row: hourglass + drain bar + cumulative score */}
+        <div className="mb-4 flex items-center gap-4">
+          <div className="flex-1">
+            <TimerBar timeRemaining={timeRemaining} maxTime={ROUND_TIME} />
+          </div>
+          <div className="relative shrink-0">
+            <span className="text-2xl font-bold tabular-nums text-foreground">
+              {score.toLocaleString()}
+            </span>
             {scorePopup && (
               <span
                 key={scorePopup.key}
-                className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-sm font-bold text-success animate-fade-in"
+                className="pointer-events-none absolute -top-6 right-0 whitespace-nowrap text-sm font-bold text-success animate-fade-in"
               >
                 +{scorePopup.base}
                 {scorePopup.bonus > 0 && (
@@ -351,7 +351,11 @@ const Question = () => {
                 )}
               </span>
             )}
-          </span>
+          </div>
+        </div>
+
+        <div className="mb-2 flex items-center justify-center gap-6 text-base">
+          <span className="text-primary">{currentQuestion.category}</span>
           {streak >= 2 && !streakLostFlash && (
             <span className="text-warning font-bold">🔥 {streak} streak</span>
           )}
