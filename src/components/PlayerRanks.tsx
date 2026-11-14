@@ -13,7 +13,10 @@ export const PlayerRanks = ({ progress, newlyUnlocked }: { progress: RankProgres
     <div className="progress-tabs" role="group" aria-label="Rank track">
       {RANK_TRACKS.map((item, index) => <TVButton key={item.key} variant={index === trackIndex ? 'primary' : 'secondary'} aria-pressed={index === trackIndex} onClick={() => setTrackIndex(index)}>{['Games', 'Personal Best', 'Streak'][index]}</TVButton>)}
     </div>
-    <p className="rank-total text-muted-foreground">{value.toLocaleString()} {track.unit} · {unlocked.length}/12 lifetime ranks</p>
+    <div className="rank-summary">
+      <p className="rank-total"><strong className="rank-lifetime-value text-foreground">{value.toLocaleString()}</strong> <span className="text-muted-foreground">{track.unit}</span></p>
+      <p className="rank-next text-warning">{next ? `${Math.max(0, next.threshold - value).toLocaleString()} ${track.unit} to ${next.name}` : 'All ranks unlocked'}</p>
+    </div>
     <ol className="rank-milestones">
       {track.milestones.map(rank => {
         const earned = unlocked.includes(rank.id);
@@ -23,6 +26,6 @@ export const PlayerRanks = ({ progress, newlyUnlocked }: { progress: RankProgres
         </li>;
       })}
     </ol>
-    <p className="rank-next text-warning">{next ? `${Math.max(0, next.threshold - value).toLocaleString()} ${track.unit} to ${next.name}` : 'All ranks unlocked'}</p>
+    <p className="rank-unlocked-total text-muted-foreground">{unlocked.length}/12 lifetime ranks unlocked</p>
   </section>;
 };

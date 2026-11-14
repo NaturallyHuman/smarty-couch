@@ -7,3 +7,5 @@
 - Keep reveal deadlines and answer-acceptance rules separate from decorative motion so pause and expiry cannot rescore or truncate accepted feedback.
 - Use a responsive fixed-anchor answer grid and separate score/rank progress views to preserve TV-safe geometry and a concise result screen.
 - Install native launcher branding from CDN pointers during Android sync and patch the existing manifest idempotently; this preserves local Java/Gradle fixes and packages real PNG resources instead of pointer files.
+- Bundle font-package CSS locally and expose heading/body font roles through global tokens so native typography does not require a runtime CDN request.
+- Distinguish underlined progress-view controls from filled rank-track selectors, with a shared high-contrast focus outline, so remote focus and active selection remain separate states.

@@ -8,6 +8,8 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
+    --font-heading: 'Sora Variable', sans-serif;
+    --font-body: 'Manrope Variable', sans-serif;
     --background: 240 10% 8%;
     --foreground: 0 0% 98%;
 
@@ -46,7 +48,7 @@ All colors MUST be HSL.
 
     --gradient-bg: linear-gradient(135deg, hsl(240 10% 8%) 0%, hsl(250 12% 12%) 50%, hsl(240 10% 8%) 100%);
     --gradient-card: linear-gradient(180deg, hsl(240 8% 14%) 0%, hsl(240 8% 10%) 100%);
-    --shadow-focus: 0 0 0 3px hsl(263 70% 58% / 0.5);
+    --shadow-focus: 0 0 0 3px hsl(var(--foreground));
     --shadow-glow: 0 0 20px hsl(263 70% 58% / 0.3);
     --shadow-answer-success: 0 0 18px hsl(var(--success) / 0.7);
     
@@ -59,6 +61,49 @@ All colors MUST be HSL.
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+}
+
+body { font-family: var(--font-body); letter-spacing: 0; }
+h1, h2, .final-number, .final-tier, .rank-name, .rank-lifetime-value { font-family: var(--font-heading); letter-spacing: 0; }
+.tv-control:focus-visible { outline: 3px solid hsl(var(--foreground)); outline-offset: 4px; box-shadow: none; }
+.view-control { border-radius: 0; border-bottom: 2px solid transparent; }
+.view-control[aria-pressed="true"] { border-bottom-color: hsl(var(--primary)); color: hsl(var(--foreground)); }
+.final-screen .round-celebration { opacity: 0.3; }
+.final-screen .celebration-piece:nth-child(n+4):nth-child(-n+9) { display: none; }
+.progress-content { height: 500px; display: flex; flex-direction: column; }
+.progress-content .final-actions { margin-top: auto; }
+.rank-summary { display: flex; align-items: baseline; justify-content: space-between; max-width: 900px; margin: 0.4rem auto 0.75rem; gap: 1rem; }
+.rank-lifetime-value { font-size: 2rem; }
+.rank-summary .rank-next { margin-top: 0; text-align: right; }
+.rank-unlocked-total { font-size: 1rem; margin-top: 0.75rem; }
+.history-footnote { font-size: 1rem; margin-top: 0.75rem; }
+.final-stats > div { display: grid; grid-template-rows: 1.8rem 3rem 1.8rem; align-items: center; }
+.final-stats .stat-category, .final-stats .stat-value { line-height: 1.2; }
+@media (min-width: 901px) {
+  .final-stats h2, .stat-detail, .best-comparison, .unlock-notice { font-size: 1.125rem; }
+}
+@media (max-width: 900px) {
+  .progress-content { height: 310px; }
+  .rank-lifetime-value { font-size: 1.5rem; }
+  .rank-unlocked-total, .history-footnote { font-size: 0.875rem; }
+  .final-stats > div { grid-template-rows: 1.25rem 1.8rem 1.25rem; }
+}
+@media (max-width: 500px) {
+  .progress-content { height: 174px; }
+  .progress-content .rank-milestones { gap: 0.1rem 0.75rem; }
+  .progress-content .rank-milestones li { padding: 0.1rem 0; }
+  .progress-content .rank-unlocked-total { margin-top: 0.1rem; }
+  .progress-content .rank-summary { margin: 0; }
+  .progress-content .rank-milestones .rank-name { font-size: 0.65rem; }
+  .progress-content .rank-milestones .rank-requirement { font-size: 0.55rem; margin-top: 0; }
+  .progress-content .progress-tabs { margin-bottom: 0.15rem; }
+  .progress-content .rank-total { margin-bottom: 0.1rem; }
+  .rank-summary { margin: 0.15rem 0; gap: 0.25rem; }
+  .rank-lifetime-value { font-size: 0.875rem; }
+  .rank-unlocked-total, .history-footnote { font-size: 0.6rem; margin-top: 0.2rem; }
+  .final-stats > div { grid-template-rows: 1rem 1.3rem 1rem; }
+  .final-content .view-control { padding: 0.2rem 0.5rem; }
+  .tv-control:focus-visible { outline-width: 2px; outline-offset: 2px; }
 }
 
 /* Stable TV geometry; smaller stages use explicit type steps, not viewport fonts. */

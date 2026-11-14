@@ -21,3 +21,8 @@
 - [x] Generate uploaded-artwork launcher densities, adaptive icon and TV banner resources.
 - [x] Install resources and merge TV launcher declarations automatically after Android sync without replacing local native configuration.
 - [x] Verify native resource installation, manifest preservation and repeat-sync behavior (four passing tests with real hosted PNGs).
+
+# Design consultation refinements
+- [x] Apply locally bundled heading/body fonts and distinct view, track, and focus styling.
+- [x] Refine final-score alignment, rank summary hierarchy, and compact history timing notes without changing gameplay rules.
+- [x] Verify real game results, remote navigation, history/rank states, TV/phone geometry and reduced motion (26 logic tests and hosted-question browser playthroughs).

@@ -53,7 +53,7 @@ const GameOver = () => {
   const history = previousScores(stats, gameId);
   return <div ref={contentRef} className="final-screen relative flex h-full w-full flex-col items-center justify-center px-[5%] py-[3%]">
     <RoundCelebration />
-    <div className="final-content relative z-10 w-full text-center">
+    <div className={`final-content relative z-10 w-full text-center ${view !== 'final' ? 'progress-content' : ''}`}>
       {view === 'final' ? <>
         <h1 className="final-eyebrow text-muted-foreground font-bold">Final Score</h1>
         <div className="final-number round-message text-primary font-bold tabular-nums">{score.toLocaleString()}</div>
@@ -67,15 +67,16 @@ const GameOver = () => {
         {newlyUnlocked.length > 0 && <p role="status" className="unlock-notice text-warning">{newlyUnlocked.length} new {newlyUnlocked.length === 1 ? 'rank' : 'ranks'} unlocked!</p>}
       </> : <>
         <div className="progress-tabs" role="group" aria-label="Progress view">
-          <TVButton variant={view === 'scores' ? 'primary' : 'secondary'} aria-pressed={view === 'scores'} onClick={() => setView('scores')}>Scores</TVButton>
-          <TVButton variant={view === 'ranks' ? 'primary' : 'secondary'} aria-pressed={view === 'ranks'} onClick={() => setView('ranks')}>Ranks</TVButton>
+          <TVButton variant="view" aria-pressed={view === 'scores'} onClick={() => setView('scores')}>Scores</TVButton>
+          <TVButton variant="view" aria-pressed={view === 'ranks'} onClick={() => setView('ranks')}>Ranks</TVButton>
         </div>
         {view === 'ranks' ? <PlayerRanks progress={{ completedGames: stats.completedGames || 0, highestScore: stats.highestScore, longestStreak: stats.longestStreak, unlockedRankIds: stats.unlockedRankIds || [] }} newlyUnlocked={newlyUnlocked} /> : <section aria-label="Previous scores" className="scores-view">
           <h1 className="text-2xl font-bold">Previous scores</h1><p className="text-muted-foreground">This run: {score.toLocaleString()}</p>
           {history.length ? <ol className="score-history">{history.map((record, index) => <li key={record.gameId}>
             <span className="text-muted-foreground">{index + 1}</span><strong className="tabular-nums">{record.score.toLocaleString()}</strong>
-            <span className="history-meta text-muted-foreground">{record.completedAt ? new Date(record.completedAt).toLocaleDateString() : 'Earlier run'}{record.rulesVersion !== RULES_VERSION && <span className="block text-warning">Earlier timing</span>}</span>
+            <span className="history-meta text-muted-foreground">{record.completedAt ? new Date(record.completedAt).toLocaleDateString() : 'Earlier run'}{record.rulesVersion !== RULES_VERSION && <span aria-label="Earlier timing"> *</span>}</span>
           </li>)}</ol> : <p className="empty-history text-muted-foreground">Your next completed game will have a score to compare.</p>}
+          {history.some(record => record.rulesVersion !== RULES_VERSION) && <p className="history-footnote text-muted-foreground">* Earlier runs used different answer timing.</p>}
         </section>}
       </>}
       {!saved && <div role="alert" className="save-notice text-warning">This result could not be saved. <TVButton variant="secondary" onClick={() => setSaved(saveLifetimeStats(stats))}>Retry Save</TVButton></div>}
