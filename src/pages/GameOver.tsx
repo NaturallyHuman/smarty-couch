@@ -4,6 +4,7 @@ import { TVButton } from '@/components/TVButton';
 import { GameState, PlayerStats } from '@/types/game';
 import { recordGameScore, loadLifetimeStats } from '@/utils/lifetimeStats';
 import { PlayerRanks } from '@/components/PlayerRanks';
+import { RoundCelebration } from '@/components/RoundCelebration';
 
 interface Tier {
   name: string;
@@ -124,33 +125,7 @@ const GameOver = () => {
 
   return (
     <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden px-[5%] py-[3%]">
-      {/* Celebration glow */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute left-1/2 top-1/3 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-60 blur-3xl animate-fade-in"
-        style={{
-          background:
-            'radial-gradient(circle, hsl(var(--primary) / 0.35) 0%, transparent 70%)',
-        }}
-      />
-      {/* Confetti dots */}
-      <div aria-hidden className="pointer-events-none absolute inset-0">
-        {[
-          { x: '12%', y: '18%', c: 'bg-primary', d: '0s' },
-          { x: '88%', y: '22%', c: 'bg-success', d: '0.4s' },
-          { x: '20%', y: '70%', c: 'bg-warning', d: '0.8s' },
-          { x: '82%', y: '74%', c: 'bg-primary', d: '1.2s' },
-          { x: '50%', y: '12%', c: 'bg-success', d: '0.2s' },
-          { x: '10%', y: '45%', c: 'bg-warning', d: '0.6s' },
-          { x: '92%', y: '50%', c: 'bg-primary', d: '1.0s' },
-        ].map((dot, i) => (
-          <span
-            key={i}
-            className={`absolute h-2 w-2 rounded-full ${dot.c} animate-pulse`}
-            style={{ left: dot.x, top: dot.y, animationDelay: dot.d }}
-          />
-        ))}
-      </div>
+      <RoundCelebration />
 
       <div className="relative z-10 flex w-full flex-col items-center text-center">
         {showRanks ? <PlayerRanks progress={{
@@ -165,7 +140,7 @@ const GameOver = () => {
         </div>
 
         {/* Score */}
-        <div className="mb-4 text-7xl font-bold tabular-nums text-primary animate-scale-in">
+        <div className="round-message mb-4 text-7xl font-bold tabular-nums text-primary">
           {finalScore.toLocaleString()}
         </div>
 

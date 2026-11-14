@@ -369,7 +369,7 @@ const Question = () => {
             {scorePopup && (
               <span
                 key={scorePopup.key}
-                className="pointer-events-none absolute -top-6 right-0 whitespace-nowrap text-sm font-bold text-success animate-fade-in"
+                className="score-gain pointer-events-none absolute -top-6 right-0 whitespace-nowrap text-sm font-bold text-success"
               >
                 +{scorePopup.base}
                 {scorePopup.bonus > 0 && (
@@ -396,6 +396,7 @@ const Question = () => {
 
         <div className="flex flex-1 items-center justify-center">
           <div
+            key={currentQuestion.id}
             className="grid items-center justify-items-center"
             style={{
               gridTemplateColumns: '360px 128px 360px',

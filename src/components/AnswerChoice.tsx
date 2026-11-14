@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { TVButton } from '@/components/TVButton';
 
 interface AnswerChoiceProps {
   letter: 'A' | 'B' | 'C' | 'D';
@@ -19,10 +20,11 @@ export const AnswerChoice = ({
   const showFeedback = feedbackState !== null && feedbackState !== undefined;
 
   return (
-    <button
+    <TVButton
+      variant="ghost"
       onClick={onClick}
       className={cn(
-        'w-full bg-transparent border-0 p-0 focus:outline-none transition-colors duration-200',
+        'answer-choice relative w-full bg-transparent border-0 p-0 focus:outline-none transition-colors duration-200 hover:bg-transparent active:scale-100',
         'text-xl font-medium leading-snug text-center',
         {
           'text-foreground': !isHighlighted && !isSelected && !showFeedback,
@@ -33,8 +35,10 @@ export const AnswerChoice = ({
           'text-destructive line-through opacity-80': feedbackState === 'incorrect',
         }
       )}
+      data-feedback={feedbackState || undefined}
+      data-selected={isSelected || undefined}
     >
-      {text}
-    </button>
+      <span className="answer-label inline-block">{text}</span>
+    </TVButton>
   );
 };

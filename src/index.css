@@ -48,6 +48,7 @@ All colors MUST be HSL.
     --gradient-card: linear-gradient(180deg, hsl(240 8% 14%) 0%, hsl(240 8% 10%) 100%);
     --shadow-focus: 0 0 0 3px hsl(263 70% 58% / 0.5);
     --shadow-glow: 0 0 20px hsl(263 70% 58% / 0.3);
+    --shadow-answer-success: 0 0 18px hsl(var(--success) / 0.7);
     
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -58,6 +59,78 @@ All colors MUST be HSL.
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+}
+
+/* Feedback transforms only the label; answer tracks and the D-pad never move. */
+.answer-choice .answer-label {
+  transition: transform 150ms ease-out;
+  transform-origin: center;
+}
+.answer-choice:hover .answer-label,
+.answer-choice:focus-visible .answer-label { transform: scale(1.025); }
+.answer-choice:active .answer-label { transform: scale(0.97); }
+.answer-choice[data-feedback="correct"] .answer-label {
+  animation: answer-correct 480ms ease-out both;
+}
+.answer-choice[data-selected="true"][data-feedback="incorrect"] .answer-label {
+  animation: answer-miss 300ms ease-out both;
+}
+.score-gain { animation: score-gain 580ms ease-out both; }
+.round-message { animation: round-arrival 650ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.celebration-piece {
+  position: absolute;
+  top: 16%;
+  width: 0.45rem;
+  height: 0.8rem;
+  background: hsl(var(--primary));
+  opacity: 0;
+  animation: celebration-fall 1600ms ease-out both;
+}
+.celebration-piece-1 { background: hsl(var(--success)); }
+.celebration-piece-2 { background: hsl(var(--warning)); }
+.celebration-piece:nth-child(1) { left: 8%; animation-delay: 80ms; }
+.celebration-piece:nth-child(2) { left: 16%; animation-delay: 210ms; }
+.celebration-piece:nth-child(3) { left: 24%; animation-delay: 30ms; }
+.celebration-piece:nth-child(4) { left: 32%; animation-delay: 180ms; }
+.celebration-piece:nth-child(5) { left: 40%; animation-delay: 320ms; }
+.celebration-piece:nth-child(6) { left: 48%; animation-delay: 120ms; }
+.celebration-piece:nth-child(7) { left: 56%; animation-delay: 260ms; }
+.celebration-piece:nth-child(8) { left: 64%; animation-delay: 70ms; }
+.celebration-piece:nth-child(9) { left: 72%; animation-delay: 200ms; }
+.celebration-piece:nth-child(10) { left: 80%; animation-delay: 350ms; }
+.celebration-piece:nth-child(11) { left: 88%; animation-delay: 150ms; }
+.celebration-piece:nth-child(12) { left: 94%; animation-delay: 280ms; }
+@keyframes answer-correct {
+  0% { transform: scale(0.97); }
+  40% { transform: scale(1.05); text-shadow: var(--shadow-answer-success); }
+  100% { transform: scale(1); }
+}
+@keyframes answer-miss {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  60% { transform: translateX(3px); }
+}
+@keyframes score-gain {
+  0% { opacity: 0; transform: translateY(5px); }
+  25%, 75% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+@keyframes round-arrival {
+  from { opacity: 0; transform: translateY(10px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes celebration-fall {
+  0% { opacity: 0; transform: translateY(-12px) rotate(0deg); }
+  15% { opacity: 0.85; }
+  100% { opacity: 0; transform: translateY(150px) rotate(220deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .answer-choice .answer-label, .score-gain, .round-message, .celebration-piece {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+  .round-celebration { display: none; }
 }
 
 @layer base {

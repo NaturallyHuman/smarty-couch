@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { GameState, Question as QuestionType } from '@/types/game';
 import { audioManager } from '@/utils/audioManager';
 import { selectQuestions } from '@/utils/questionSelector';
+import { RoundCelebration } from '@/components/RoundCelebration';
 
 const DURATION_MS = 5000;
 const QUESTION_POOL_SIZE = 30;
@@ -133,8 +134,9 @@ const RoundIntro = () => {
   }, [gameState, navigate]);
 
   return (
-    <div className="flex h-full w-full items-center justify-center px-[5%] py-[3%]">
-      <div className="w-full max-w-[85%] text-center animate-fade-in">
+    <div className="relative flex h-full w-full items-center justify-center px-[5%] py-[3%]">
+      {gameState?.currentRound > 1 && <RoundCelebration />}
+      <div className={`relative w-full max-w-[85%] text-center ${gameState?.currentRound > 1 ? 'round-message' : 'animate-fade-in'}`}>
         <p className="text-5xl md:text-6xl font-bold leading-tight text-primary">
           {message}
         </p>
