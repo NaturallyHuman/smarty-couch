@@ -131,6 +131,14 @@ All colors MUST be HSL.
   .history-meta { font-size: 0.7rem; }
 }
 @media (max-width: 500px) {
+  .final-content .final-actions button, .final-content .progress-tabs button { font-size: 0.7rem; line-height: 1.2; padding: 0.25rem 0.4rem; }
+  .final-content .final-actions { margin-top: 0.35rem; }
+  .final-content .progress-tabs { margin-bottom: 0.25rem; }
+  .final-content .rank-milestones li { padding: 0.15rem 0; }
+  .final-content .rank-name { font-size: 0.75rem; line-height: 1.2; }
+  .final-content .rank-requirement { line-height: 1.2; }
+  .final-content .empty-history { font-size: 0.75rem; margin: 0.75rem 0; }
+  .final-content .unlock-notice { margin-top: 0.15rem; }
   .question-title { font-size: 0.7rem; height: 3rem; }
   .question-screen > div:first-child span { font-size: 1rem; }
   .answer-grid { grid-template-columns: minmax(0, 1fr) 48px minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) 48px minmax(0, 1fr); gap: 6px; }
