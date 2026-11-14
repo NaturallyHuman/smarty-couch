@@ -1,4 +1,5 @@
 import { LifetimeStats, RoundResult } from '@/types/game';
+import { getUnlockedRankIds } from './playerRanks';
 
 const STORAGE_KEY = 'smarty-couch-stats';
 const MAX_RECENT_SCORES = 10;
@@ -20,7 +21,7 @@ export const loadLifetimeStats = (): LifetimeStats => {
   } catch (error) {
     console.error('Error loading stats:', error);
   }
-  return defaultStats;
+  return { ...defaultStats, recentScores: [], categoryStats: {} };
 };
 
 export const saveLifetimeStats = (stats: LifetimeStats): void => {
@@ -59,14 +60,29 @@ export const updateLifetimeStats = (
  * Returns the previous personal best (before this game) so callers can detect
  * a new record.
  */
-export const recordGameScore = (finalScore: number): { stats: LifetimeStats; previousBest: number } => {
+export const recordGameScore = (finalScore: number, maxStreak = 0, gameId?: string): { stats: LifetimeStats; previousBest: number; newlyUnlocked: string[] } => {
   const stats = loadLifetimeStats();
   const previousBest = stats.highestScore;
+  const completedGames = stats.completedGames ?? (stats.recentScores || []).length;
+  const previousRanks = getUnlockedRankIds({
+    completedGames, highestScore: stats.highestScore, longestStreak: stats.longestStreak,
+    unlockedRankIds: stats.unlockedRankIds || [],
+  });
+  if (gameId && stats.recordedGameIds?.includes(gameId)) {
+    return { stats, previousBest, newlyUnlocked: [] };
+  }
 
   stats.recentScores = [finalScore, ...(stats.recentScores || [])].slice(0, MAX_RECENT_SCORES);
   stats.highestScore = Math.max(stats.highestScore, finalScore);
+  stats.longestStreak = Math.max(stats.longestStreak, maxStreak);
+  stats.completedGames = completedGames + 1;
+  stats.unlockedRankIds = getUnlockedRankIds({
+    completedGames: stats.completedGames, highestScore: stats.highestScore,
+    longestStreak: stats.longestStreak, unlockedRankIds: previousRanks,
+  });
+  if (gameId) stats.recordedGameIds = [...(stats.recordedGameIds || []), gameId];
   stats.timesPlayed += 1;
 
   saveLifetimeStats(stats);
-  return { stats, previousBest };
+  return { stats, previousBest, newlyUnlocked: stats.unlockedRankIds.filter(id => !previousRanks.includes(id)) };
 };

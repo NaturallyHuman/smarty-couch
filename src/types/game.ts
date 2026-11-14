@@ -26,6 +26,7 @@ export interface PlayerStats {
 }
 
 export interface GameState {
+  gameId?: string;
   mode: GameMode;
   category: string;
   currentRound: number;
@@ -56,6 +57,9 @@ export interface Badge {
 }
 
 export interface LifetimeStats {
+  completedGames?: number;
+  unlockedRankIds?: string[];
+  recordedGameIds?: string[];
   highestScore: number;
   longestStreak: number;
   timesPlayed: number;

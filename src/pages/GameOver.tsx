@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { TVButton } from '@/components/TVButton';
 import { GameState, PlayerStats } from '@/types/game';
-import { recordGameScore } from '@/utils/lifetimeStats';
+import { recordGameScore, loadLifetimeStats } from '@/utils/lifetimeStats';
+import { PlayerRanks } from '@/components/PlayerRanks';
 
 interface Tier {
   name: string;
@@ -69,6 +70,10 @@ const GameOver = () => {
   const location = useLocation();
   const playAgainRef = useRef<HTMLButtonElement>(null);
   const recordedRef = useRef(false);
+  const [stats, setStats] = useState(loadLifetimeStats);
+  const [newlyUnlocked, setNewlyUnlocked] = useState<string[]>([]);
+  const [showRanks, setShowRanks] = useState(false);
+  const actionsRef = useRef<HTMLDivElement>(null);
 
   const gameState = location.state?.gameState as GameState;
 
@@ -76,7 +81,9 @@ const GameOver = () => {
     if (!gameState || recordedRef.current) return;
     recordedRef.current = true;
     const finalScore = gameState.players[0].totalScore;
-    recordGameScore(finalScore);
+    const result = recordGameScore(finalScore, gameState.players[0].maxStreak, gameState.gameId || location.key);
+    setStats(result.stats);
+    setNewlyUnlocked(result.newlyUnlocked);
   }, [gameState]);
 
   useEffect(() => {
@@ -85,14 +92,20 @@ const GameOver = () => {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Enter') {
+      if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
         e.preventDefault();
-        navigate('/');
+        const buttons = Array.from(actionsRef.current?.querySelectorAll('button') || []);
+        const index = buttons.indexOf(document.activeElement as HTMLButtonElement);
+        const step = e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 1;
+        buttons[(index + step + buttons.length) % buttons.length]?.focus();
+      } else if (e.key === 'Escape' && showRanks) {
+        e.preventDefault();
+        setShowRanks(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [navigate]);
+  }, [showRanks]);
 
   const player = gameState?.players[0];
   const finalScore = player?.totalScore ?? 0;
@@ -139,7 +152,13 @@ const GameOver = () => {
         ))}
       </div>
 
-      <div className="relative z-10 flex flex-col items-center text-center">
+      <div className="relative z-10 flex w-full flex-col items-center text-center">
+        {showRanks ? <PlayerRanks progress={{
+          completedGames: stats.completedGames ?? (stats.recentScores || []).length,
+          highestScore: stats.highestScore,
+          longestStreak: stats.longestStreak,
+          unlockedRankIds: stats.unlockedRankIds || [],
+        }} newlyUnlocked={newlyUnlocked} /> : <>
         {/* Eyebrow */}
         <div className="mb-3 text-sm font-bold uppercase tracking-[0.3em] text-muted-foreground">
           Final Score
@@ -151,12 +170,12 @@ const GameOver = () => {
         </div>
 
         {/* Tier name */}
-        <div className="mb-12 text-3xl font-bold text-foreground">
+        <div className="mb-6 text-3xl font-bold text-foreground">
           {currentTier.name}!
         </div>
 
         {/* Stats row */}
-        <div className="mb-12 flex items-start justify-center gap-16">
+        <div className="mb-6 flex items-start justify-center gap-16">
           <div className="flex flex-col items-center">
             <div className="mb-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
               Best streak
@@ -193,11 +212,16 @@ const GameOver = () => {
             </div>
           )}
         </div>
+        {newlyUnlocked.length > 0 && <p role="status" className="mb-3 text-sm font-semibold text-warning">{newlyUnlocked.length} new {newlyUnlocked.length === 1 ? 'rank' : 'ranks'} unlocked!</p>}
+        </>}
 
         {/* Actions */}
-        <div className="flex items-center gap-4">
+        <div ref={actionsRef} className="mt-4 flex items-center gap-4">
           <TVButton ref={playAgainRef} size="large" onClick={() => navigate('/')}>
             Play Again
+          </TVButton>
+          <TVButton variant="secondary" onClick={() => setShowRanks(value => !value)} aria-pressed={showRanks}>
+            {showRanks ? 'Final Score' : 'Player Ranks'}
           </TVButton>
           <TVButton variant="secondary" size="large" onClick={() => navigate('/')}>
             Home

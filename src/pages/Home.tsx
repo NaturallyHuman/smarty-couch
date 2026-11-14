@@ -13,6 +13,7 @@ const Home = () => {
 
   const handlePlay = () => {
     const gameState: GameState = {
+      gameId: crypto.randomUUID(),
       mode: 'solo',
       category: 'Mixed',
       currentRound: 1,
