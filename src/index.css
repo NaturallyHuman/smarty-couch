@@ -61,6 +61,103 @@ All colors MUST be HSL.
   }
 }
 
+/* Stable TV geometry; smaller stages use explicit type steps, not viewport fonts. */
+.question-screen { min-height: 0; }
+.question-title { height: 4.5rem; flex-shrink: 0; font-size: 1.5rem; padding: 0 2%; margin-bottom: 0.5rem; overflow-wrap: anywhere; }
+.answer-stage { display: flex; flex: 1; min-height: 0; align-items: center; justify-content: center; }
+.answer-grid { display: grid; width: 100%; height: 100%; max-height: 360px; grid-template-columns: minmax(0, 1fr) 128px minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) 128px minmax(0, 1fr); gap: 32px; align-items: center; justify-items: center; }
+.dpad-anchor { width: 128px; height: 128px; }
+.answer-horizontal { width: 100%; min-width: 0; }
+.answer-vertical { width: 65%; min-width: 0; }
+.answer-left .answer-choice { text-align: right; }
+.answer-right .answer-choice { text-align: left; }
+.answer-text { font-size: 1.5rem; overflow-wrap: anywhere; white-space: normal; }
+.answer-status { display: inline-flex; vertical-align: middle; margin-left: 0.4rem; width: 1.2rem; height: 1.2rem; }
+.answer-status svg { width: 100%; height: 100%; }
+.intro-message { font-size: 3.75rem; }
+.final-content { max-width: 100%; }
+.final-eyebrow { font-size: 1rem; text-transform: uppercase; margin-bottom: 0.6rem; }
+.final-number { font-size: 4.5rem; line-height: 1.1; margin-bottom: 0.5rem; }
+.final-tier { font-size: 1.875rem; margin-bottom: 1.2rem; }
+.final-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5rem; max-width: 900px; margin: 0 auto 1rem; }
+.final-stats h2 { font-size: 1rem; color: hsl(var(--muted-foreground)); margin-bottom: 0.4rem; }
+.stat-value { font-size: 2.25rem; font-weight: 700; }
+.stat-category { font-size: 1.5rem; font-weight: 700; overflow-wrap: anywhere; }
+.stat-detail, .best-comparison, .unlock-notice { font-size: 1rem; }
+.unlock-notice { margin-top: 0.5rem; }
+.final-actions, .progress-tabs { display: flex; justify-content: center; gap: 0.75rem; align-items: center; }
+.final-actions { margin-top: 1.2rem; }
+.progress-tabs { margin-bottom: 0.75rem; }
+.rank-total { font-size: 1.125rem; margin-bottom: 0.5rem; }
+.rank-milestones { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem 1.5rem; max-width: 900px; margin: auto; }
+.rank-milestones li { display: flex; align-items: center; text-align: left; gap: 0.75rem; border-bottom: 1px solid hsl(var(--border)); padding: 0.6rem 0; }
+.rank-milestones svg { flex-shrink: 0; width: 1.5rem; height: 1.5rem; }
+.rank-name { font-size: 1.5rem; }
+.rank-requirement, .rank-next { font-size: 1.125rem; }
+.rank-next { margin-top: 0.75rem; }
+.score-history { display: grid; grid-template-rows: repeat(5, auto); grid-auto-flow: column; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.35rem 2rem; margin: 0.75rem auto; max-width: 900px; }
+.score-history li { display: grid; grid-template-columns: 2rem 1fr 1fr; column-gap: 0.35rem; align-items: center; border-bottom: 1px solid hsl(var(--border)); padding: 0.4rem; text-align: left; font-size: 1.25rem; }
+.history-meta { font-size: 0.9rem; text-align: right; }
+.empty-history { margin: 2rem 0; font-size: 1.25rem; }
+.save-notice { margin-top: 0.5rem; }
+@media (min-width: 1600px) {
+  .question-title { font-size: 1.875rem; height: 5rem; }
+  .answer-grid { max-height: 440px; }
+  .answer-text { font-size: 1.875rem; }
+  .final-number { font-size: 6rem; }
+  .rank-name { font-size: 1.875rem; }
+}
+@media (max-width: 900px) {
+  .question-screen > div:first-child { gap: 0.4rem; margin-bottom: 0.25rem; }
+  .question-screen > div:nth-child(2) { font-size: 0.875rem; margin-bottom: 0.25rem; }
+  .question-title { font-size: 1.125rem; height: 3rem; }
+  .answer-grid { grid-template-columns: minmax(0, 1fr) 80px minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) 80px minmax(0, 1fr); gap: 12px; }
+  .dpad-anchor { width: 80px; height: 80px; }
+  .dpad-anchor > div { transform: scale(0.625); width: 128px; height: 128px; flex-shrink: 0; }
+  .answer-text { font-size: 1rem; }
+  .intro-message { font-size: 2rem; }
+  .final-eyebrow, .final-stats h2, .stat-detail, .best-comparison, .unlock-notice { font-size: 0.875rem; }
+  .final-number { font-size: 2.5rem; }
+  .final-tier { font-size: 1.25rem; margin-bottom: 0.5rem; }
+  .final-stats { gap: 0.5rem; margin-bottom: 0.5rem; }
+  .stat-value, .stat-category { font-size: 1.125rem; }
+  .final-actions { margin-top: 0.5rem; }
+  .final-actions button, .progress-tabs button { font-size: 1rem; padding: 0.4rem 0.6rem; }
+  .rank-name { font-size: 1.125rem; }
+  .rank-requirement, .rank-next, .rank-total { font-size: 0.875rem; }
+  .rank-milestones { gap: 0.25rem 0.75rem; }
+  .rank-milestones li { padding: 0.3rem 0; }
+  .score-history li { font-size: 1rem; padding: 0.15rem; }
+  .history-meta { font-size: 0.7rem; }
+}
+@media (max-width: 500px) {
+  .question-title { font-size: 0.7rem; height: 3rem; }
+  .question-screen > div:first-child span { font-size: 1rem; }
+  .answer-grid { grid-template-columns: minmax(0, 1fr) 48px minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) 48px minmax(0, 1fr); gap: 6px; }
+  .dpad-anchor { width: 48px; height: 48px; }
+  .dpad-anchor > div { transform: scale(0.375); }
+  .answer-text { font-size: 0.5625rem; line-height: 1.1; }
+  .answer-vertical { width: 90%; }
+  .answer-status { width: 0.75rem; height: 0.75rem; margin-left: 0.15rem; }
+  .intro-message { font-size: 1.25rem; }
+  .final-eyebrow { font-size: 0.7rem; margin-bottom: 0.2rem; }
+  .final-number { font-size: 1.75rem; margin-bottom: 0.2rem; }
+  .final-tier { font-size: 0.875rem; margin-bottom: 0.25rem; }
+  .final-stats h2, .stat-detail, .best-comparison, .unlock-notice { font-size: 0.6rem; }
+  .stat-value, .stat-category { font-size: 0.875rem; }
+  .final-stats { margin-bottom: 0.25rem; }
+  .final-actions button, .progress-tabs button { font-size: 0.7rem; padding: 0.25rem 0.4rem; }
+  .progress-tabs { gap: 0.25rem; margin-bottom: 0.25rem; }
+  .rank-name { font-size: 0.75rem; }
+  .rank-requirement, .rank-next, .rank-total { font-size: 0.6rem; margin-top: 0.2rem; }
+  .rank-milestones svg { width: 0.75rem; height: 0.75rem; }
+  .scores-view h1 { font-size: 0.875rem; }
+  .scores-view > p { font-size: 0.65rem; }
+  .score-history { gap: 0.1rem 0.4rem; margin: 0.25rem 0; }
+  .score-history li { grid-template-columns: 0.85rem 1fr 1fr; column-gap: 0.15rem; font-size: 0.65rem; }
+  .history-meta { font-size: 0.5rem; }
+}
+
 /* Feedback transforms only the label; answer tracks and the D-pad never move. */
 .answer-choice .answer-label {
   transition: transform 150ms ease-out;

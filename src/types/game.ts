@@ -56,14 +56,23 @@ export interface Badge {
   condition: (stats: PlayerStats) => boolean;
 }
 
+export interface ScoreRecord {
+  gameId: string;
+  score: number;
+  completedAt?: string;
+  rulesVersion?: string;
+  previousBest?: number;
+}
+
 export interface LifetimeStats {
+  scoreRecords?: ScoreRecord[];
   completedGames?: number;
   unlockedRankIds?: string[];
   recordedGameIds?: string[];
   highestScore: number;
   longestStreak: number;
   timesPlayed: number;
-  recentScores: number[]; // newest first, max 10
+  recentScores: number[]; // newest first, current plus ten previous
   categoryStats: {
     [category: string]: {
       correct: number;

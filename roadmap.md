@@ -9,3 +9,10 @@
 # Gameplay animation
 - [x] Add answer-selection reactions, correct-answer motion, and shared round-completion celebrations.
 - [x] Verify real answer feedback, stable arrows, unchanged progression, and reduced-motion behavior.
+
+# Approved design refinements
+- [x] Verify existing cumulative score with known correct answers.
+- [x] Add fixed-anchor responsive answers, longer feedback, direct replay, previous scores, and readable rank tracks.
+- [x] Add preload retry and save-failure recovery.
+- [ ] Verify timing rules, result history, remote flow, long-text geometry, and reduced motion.
+- [ ] Verify Android TV emulator and real remote/couch-distance readability. Blocked: no native emulator or physical TV is available in this workspace.

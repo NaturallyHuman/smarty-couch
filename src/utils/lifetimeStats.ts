@@ -1,8 +1,9 @@
 import { LifetimeStats, RoundResult } from '@/types/game';
 import { getUnlockedRankIds } from './playerRanks';
+import { RULES_VERSION } from './gameSession';
 
 const STORAGE_KEY = 'smarty-couch-stats';
-const MAX_RECENT_SCORES = 10;
+const MAX_RECENT_SCORES = 11;
 
 const defaultStats: LifetimeStats = {
   highestScore: 0,
@@ -16,7 +17,9 @@ export const loadLifetimeStats = (): LifetimeStats => {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
-      return { ...defaultStats, ...JSON.parse(stored) };
+      const parsed = JSON.parse(stored);
+      if (!parsed || typeof parsed !== 'object' || !Array.isArray(parsed.recentScores)) throw new Error('Invalid saved statistics');
+      return { ...defaultStats, ...parsed, scoreRecords: parsed.scoreRecords || parsed.recentScores.map((score: number, index: number) => ({ gameId: `legacy-${index}`, score })) };
     }
   } catch (error) {
     console.error('Error loading stats:', error);
@@ -24,11 +27,13 @@ export const loadLifetimeStats = (): LifetimeStats => {
   return { ...defaultStats, recentScores: [], categoryStats: {} };
 };
 
-export const saveLifetimeStats = (stats: LifetimeStats): void => {
+export const saveLifetimeStats = (stats: LifetimeStats): boolean => {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
+    return true;
   } catch (error) {
     console.error('Error saving stats:', error);
+    return false;
   }
 };
 
@@ -60,7 +65,7 @@ export const updateLifetimeStats = (
  * Returns the previous personal best (before this game) so callers can detect
  * a new record.
  */
-export const recordGameScore = (finalScore: number, maxStreak = 0, gameId?: string): { stats: LifetimeStats; previousBest: number; newlyUnlocked: string[] } => {
+export const recordGameScore = (finalScore: number, maxStreak = 0, gameId?: string): { stats: LifetimeStats; previousBest: number; newlyUnlocked: string[]; saved: boolean } => {
   const stats = loadLifetimeStats();
   const previousBest = stats.highestScore;
   const completedGames = stats.completedGames ?? (stats.recentScores || []).length;
@@ -69,10 +74,11 @@ export const recordGameScore = (finalScore: number, maxStreak = 0, gameId?: stri
     unlockedRankIds: stats.unlockedRankIds || [],
   });
   if (gameId && stats.recordedGameIds?.includes(gameId)) {
-    return { stats, previousBest, newlyUnlocked: [] };
+    return { stats, previousBest: stats.scoreRecords?.find(record => record.gameId === gameId)?.previousBest ?? previousBest, newlyUnlocked: [], saved: true };
   }
 
   stats.recentScores = [finalScore, ...(stats.recentScores || [])].slice(0, MAX_RECENT_SCORES);
+  stats.scoreRecords = [{ gameId: gameId || crypto.randomUUID(), score: finalScore, completedAt: new Date().toISOString(), rulesVersion: RULES_VERSION, previousBest }, ...(stats.scoreRecords || [])].slice(0, MAX_RECENT_SCORES);
   stats.highestScore = Math.max(stats.highestScore, finalScore);
   stats.longestStreak = Math.max(stats.longestStreak, maxStreak);
   stats.completedGames = completedGames + 1;
@@ -83,6 +89,6 @@ export const recordGameScore = (finalScore: number, maxStreak = 0, gameId?: stri
   if (gameId) stats.recordedGameIds = [...(stats.recordedGameIds || []), gameId];
   stats.timesPlayed += 1;
 
-  saveLifetimeStats(stats);
-  return { stats, previousBest, newlyUnlocked: stats.unlockedRankIds.filter(id => !previousRanks.includes(id)) };
+  const saved = saveLifetimeStats(stats);
+  return { stats, previousBest, saved, newlyUnlocked: stats.unlockedRankIds.filter(id => !previousRanks.includes(id)) };
 };

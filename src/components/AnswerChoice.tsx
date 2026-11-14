@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils';
 import { TVButton } from '@/components/TVButton';
+import { Check, X } from 'lucide-react';
 
 interface AnswerChoiceProps {
   letter: 'A' | 'B' | 'C' | 'D';
@@ -25,7 +26,7 @@ export const AnswerChoice = ({
       onClick={onClick}
       className={cn(
         'answer-choice relative w-full bg-transparent border-0 p-0 focus:outline-none transition-colors duration-200 hover:bg-transparent active:scale-100',
-        'text-xl font-medium leading-snug text-center',
+        'answer-text font-medium leading-snug',
         {
           'text-foreground': !isHighlighted && !isSelected && !showFeedback,
           'text-primary [text-shadow:0_0_18px_hsl(var(--primary)/0.7)]':
@@ -38,7 +39,10 @@ export const AnswerChoice = ({
       data-feedback={feedbackState || undefined}
       data-selected={isSelected || undefined}
     >
-      <span className="answer-label inline-block">{text}</span>
+      <span className="answer-label inline-block relative">
+        {text}
+        {showFeedback && <span className="answer-status" aria-label={feedbackState === 'correct' ? 'Correct answer' : 'Incorrect answer'}>{feedbackState === 'correct' ? <Check /> : <X />}</span>}
+      </span>
     </TVButton>
   );
 };

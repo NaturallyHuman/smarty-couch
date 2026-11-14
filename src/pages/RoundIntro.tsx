@@ -4,6 +4,7 @@ import { GameState, Question as QuestionType } from '@/types/game';
 import { audioManager } from '@/utils/audioManager';
 import { selectQuestions } from '@/utils/questionSelector';
 import { RoundCelebration } from '@/components/RoundCelebration';
+import { TVButton } from '@/components/TVButton';
 
 const DURATION_MS = 5000;
 const QUESTION_POOL_SIZE = 30;
@@ -51,6 +52,10 @@ const RoundIntro = () => {
   const timerDoneRef = useRef(false);
   const navigatedRef = useRef(false);
   const [, forceTick] = useState(0);
+  const [error, setError] = useState(false);
+  const [retry, setRetry] = useState(0);
+  const retryRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => { if (error) retryRef.current?.focus(); }, [error]);
 
   const tryNavigate = () => {
     if (navigatedRef.current) return;
@@ -89,14 +94,14 @@ const RoundIntro = () => {
         tryNavigate();
       } catch (err) {
         console.error('Failed to preload questions:', err);
-        if (!cancelled) navigate('/');
+        if (!cancelled) setError(true);
       }
     })();
     return () => {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [retry]);
 
   // Timer
   useEffect(() => {
@@ -119,6 +124,15 @@ const RoundIntro = () => {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (error) {
+        if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+          e.preventDefault();
+          const buttons = Array.from(document.querySelectorAll('button'));
+          const index = buttons.indexOf(document.activeElement as HTMLButtonElement);
+          buttons[(index + 1) % buttons.length]?.focus();
+        }
+        return;
+      }
       if (e.key === 'Enter') {
         e.preventDefault();
         handleStart();
@@ -131,15 +145,13 @@ const RoundIntro = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gameState, navigate]);
+  }, [gameState, navigate, error]);
 
   return (
     <div className="relative flex h-full w-full items-center justify-center px-[5%] py-[3%]">
       {gameState?.currentRound > 1 && <RoundCelebration />}
       <div className={`relative w-full max-w-[85%] text-center ${gameState?.currentRound > 1 ? 'round-message' : 'animate-fade-in'}`}>
-        <p className="text-5xl md:text-6xl font-bold leading-tight text-primary">
-          {message}
-        </p>
+        {error ? <><p role="alert" className="text-2xl text-foreground">Questions couldn't load.</p><div className="progress-tabs mt-6"><TVButton ref={retryRef} onClick={() => { setError(false); preloadedRef.current = null; setRetry(n => n + 1); }}>Retry</TVButton><TVButton variant="secondary" onClick={() => navigate('/')}>Home</TVButton></div></> : <p className="intro-message font-bold leading-tight text-primary">{message}</p>}
       </div>
     </div>
   );

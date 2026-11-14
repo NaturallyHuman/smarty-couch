@@ -9,10 +9,11 @@ import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/compone
 import { TVButton } from '@/components/TVButton';
 import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react';
 import { audioManager } from '@/utils/audioManager';
+import { ANSWER_REVEAL_MS, remainingReveal, canAcceptAnswer } from '@/utils/gameSession';
 
 const ROUND_TIME = 60; // seconds — the entire round is one 60s sprint
 const QUESTION_POOL_SIZE = 30; // fetched up front so we never run out
-const FEEDBACK_DELAY = 600; // snappier sprint feel
+const FEEDBACK_DELAY = ANSWER_REVEAL_MS;
 
 type AnswerDirection = 0 | 1 | 2 | 3 | null;
 
@@ -47,6 +48,10 @@ const Question = () => {
   const correctSoundRef = useRef<HTMLAudioElement | null>(null);
   const incorrectSoundRef = useRef<HTMLAudioElement | null>(null);
   const roundEndedRef = useRef(false);
+  const revealDeadlineRef = useRef(0);
+  const revealRemainingRef = useRef(0);
+  const revealingRef = useRef(false);
+  const timeRemainingRef = useRef(ROUND_TIME);
   const lastWasWrongRef = useRef(false);
   const roundStartScoreRef = useRef(0);
 
@@ -61,6 +66,7 @@ const Question = () => {
   const attemptedByCategoryRef = useRef<{ [key: string]: number }>({});
   const currentIndexRef = useRef(0);
 
+  useEffect(() => { timeRemainingRef.current = timeRemaining; }, [timeRemaining]);
   useEffect(() => { scoreRef.current = score; }, [score]);
   useEffect(() => { correctCountRef.current = correctCount; }, [correctCount]);
   useEffect(() => { attemptedCountRef.current = attemptedCount; }, [attemptedCount]);
@@ -148,9 +154,9 @@ const Question = () => {
   // When the timer hits zero, end the round (in an effect, not inside a setState updater).
   useEffect(() => {
     if (timeRemaining === 0 && questions.length > 0 && !roundEndedRef.current) {
-      handleRoundEnd();
+      if (!revealingRef.current && !showPauseDialog) handleRoundEnd();
     }
-  }, [timeRemaining, questions.length]);
+  }, [timeRemaining, questions.length, showPauseDialog]);
 
   const handleRoundEnd = () => {
     if (roundEndedRef.current) return;
@@ -224,6 +230,7 @@ const Question = () => {
 
   const handleAnswer = (answerIndex: AnswerDirection) => {
     if (
+      !canAcceptAnswer(timeRemainingRef.current, revealingRef.current, showPauseDialog, roundEndedRef.current) ||
       answerIndex === null ||
       selectedAnswer !== null ||
       feedbackState !== null ||
@@ -232,6 +239,7 @@ const Question = () => {
     )
       return;
 
+    revealingRef.current = true;
     setSelectedAnswer(answerIndex);
 
     const isCorrect = answerIndex === currentQuestion.correctIndex;
@@ -271,8 +279,11 @@ const Question = () => {
       }
     }
 
+    revealDeadlineRef.current = Date.now() + FEEDBACK_DELAY;
     feedbackTimeoutRef.current = setTimeout(() => {
-      moveToNext();
+      revealingRef.current = false;
+      if (timeRemainingRef.current <= 0) handleRoundEnd();
+      else moveToNext();
     }, FEEDBACK_DELAY);
   };
 
@@ -292,10 +303,14 @@ const Question = () => {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (showPauseDialog) return;
+      if (showPauseDialog || e.repeat) return;
 
       if (e.key === 'Escape') {
         e.preventDefault();
+        if (revealingRef.current) {
+          if (feedbackTimeoutRef.current) clearTimeout(feedbackTimeoutRef.current);
+          revealRemainingRef.current = remainingReveal(revealDeadlineRef.current, Date.now());
+        }
         setShowPauseDialog(true);
         if (timerRef.current) clearInterval(timerRef.current);
         return;
@@ -337,6 +352,14 @@ const Question = () => {
 
   const handleResume = () => {
     setShowPauseDialog(false);
+    if (revealingRef.current) {
+      revealDeadlineRef.current = Date.now() + revealRemainingRef.current;
+      feedbackTimeoutRef.current = setTimeout(() => {
+        revealingRef.current = false;
+        if (timeRemainingRef.current <= 0) handleRoundEnd();
+        else moveToNext();
+      }, revealRemainingRef.current);
+    }
     audioManager.setTrackVolume('question', 0.35, 500);
   };
 
@@ -356,7 +379,7 @@ const Question = () => {
 
   return (
     <>
-      <div className="flex h-full w-full flex-col px-[5%] py-[3%]">
+      <div className="question-screen flex h-full w-full flex-col px-[5%] py-[3%]">
         {/* Top row: hourglass + drain bar + cumulative score */}
         <div className="mb-4 flex items-center gap-4">
           <div className="flex-1">
@@ -390,22 +413,16 @@ const Question = () => {
           )}
         </div>
 
-        <h1 className="mb-6 text-center text-2xl font-semibold leading-tight px-8">
+        <h1 className="question-title text-center font-semibold leading-tight">
           {currentQuestion.text}
         </h1>
 
-        <div className="flex flex-1 items-center justify-center">
+        <div className="answer-stage">
           <div
             key={currentQuestion.id}
-            className="grid items-center justify-items-center"
-            style={{
-              gridTemplateColumns: '360px 128px 360px',
-              gridTemplateRows: 'auto 128px auto',
-              columnGap: '32px',
-              rowGap: '32px',
-            }}
+            className="answer-grid"
           >
-            <div className="col-span-3 w-[420px] text-center">
+            <div className="answer-vertical col-span-3 text-center">
               <AnswerChoice
                 letter="A"
                 text={currentQuestion.choices[0]}
@@ -422,7 +439,7 @@ const Question = () => {
               />
             </div>
 
-            <div className="w-[360px] text-right">
+            <div className="answer-horizontal answer-left text-right">
               <AnswerChoice
                 letter="B"
                 text={currentQuestion.choices[1]}
@@ -439,8 +456,8 @@ const Question = () => {
               />
             </div>
 
-            <div className="flex h-32 w-32 shrink-0 items-center justify-center">
-              <div className="relative h-full w-full opacity-30">
+            <div className="dpad-anchor flex shrink-0 items-center justify-center">
+              <div className="relative h-full w-full opacity-70">
                 <div className="absolute left-1/2 top-0 grid h-10 w-10 -translate-x-1/2 place-items-center rounded-t-lg border-2 border-foreground/50 bg-background/20">
                   <ArrowUp className="h-5 w-5 shrink-0" />
                 </div>
@@ -457,7 +474,7 @@ const Question = () => {
               </div>
             </div>
 
-            <div className="w-[360px] text-left">
+            <div className="answer-horizontal answer-right text-left">
               <AnswerChoice
                 letter="D"
                 text={currentQuestion.choices[3]}
@@ -474,7 +491,7 @@ const Question = () => {
               />
             </div>
 
-            <div className="col-span-3 w-[420px] text-center">
+            <div className="answer-vertical col-span-3 text-center">
               <AnswerChoice
                 letter="C"
                 text={currentQuestion.choices[2]}
@@ -494,7 +511,7 @@ const Question = () => {
         </div>
       </div>
 
-      <Dialog open={showPauseDialog} onOpenChange={setShowPauseDialog}>
+      <Dialog open={showPauseDialog} onOpenChange={(open) => { if (!open) handleResume(); }}>
         <DialogContent className="bg-card sm:max-w-md">
           <DialogTitle className="text-3xl">Game Paused</DialogTitle>
           <DialogDescription className="text-xl text-muted-foreground">
