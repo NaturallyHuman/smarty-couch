@@ -16,3 +16,8 @@
 - [x] Add preload retry and save-failure recovery.
 - [x] Verify timing rules, result history, remote flow, long-text geometry, and reduced motion.
 - [ ] Verify Android TV emulator and real remote/couch-distance readability. Blocked: no native emulator or physical TV is available in this workspace.
+
+# Native Android TV branding
+- [x] Generate uploaded-artwork launcher densities, adaptive icon and TV banner resources.
+- [x] Install resources and merge TV launcher declarations automatically after Android sync without replacing local native configuration.
+- [x] Verify native resource installation, manifest preservation and repeat-sync behavior (four passing tests with real hosted PNGs).

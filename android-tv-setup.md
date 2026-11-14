@@ -50,34 +50,32 @@ npx cap open android
 
 Or manually open the `android/` folder in Android Studio.
 
-### 7. Configure for Android TV
+### 7. Uploaded Android TV Icon and Banner
 
-In Android Studio, you need to make a few TV-specific configurations:
+The uploaded Smarty Couch artwork is now prepared as native resources:
+- Legacy launcher PNGs at mdpi, hdpi, xhdpi, xxhdpi and xxxhdpi sizes.
+- An adaptive launcher icon for Android 8+ with the complete artwork inside its safe area.
+- A 320×180 Android TV banner using the same artwork (not the square launcher icon).
 
-#### Edit `android/app/src/main/AndroidManifest.xml`:
-
-Add these inside the `<manifest>` tag (before `<application>`):
-```xml
-<uses-feature
-    android:name="android.software.leanback"
-    android:required="true" />
-<uses-feature
-    android:name="android.hardware.touchscreen"
-    android:required="false" />
+After updating your local checkout from the connected repository, run from the project root:
+```bash
+npm install
+npm run build
+npx cap sync android
 ```
 
-Inside the `<application>` tag, add:
-```xml
-android:banner="@mipmap/ic_launcher"
+The sync hook automatically downloads the committed artwork pointers into actual Android PNG resources and updates your existing `android/app/src/main/AndroidManifest.xml`. It does not replace your Android project, alter your package ID, or change your working Java 17/Gradle configuration. Internet access is required for this resource installation; installed artwork is bundled in the APK and does not need internet to display.
+
+If Android does not exist locally yet, run `npx cap add android` before syncing. Do not delete or recreate an existing Android project.
+
+The manifest receives `android:icon` and `android:roundIcon` pointing to `@mipmap/smarty_couch_launcher`, plus `android:banner` pointing to `@drawable/smarty_couch_tv_banner`. MainActivity includes both phone `LAUNCHER` and TV `LEANBACK_LAUNCHER` categories; Leanback and touchscreen features are optional to retain phone compatibility. Existing permissions, themes, providers and activity settings are preserved. The first changed manifest is backed up alongside it as `AndroidManifest.xml.smarty-couch-backup`.
+
+For an existing Android project, you can also apply only the branding with:
+```bash
+npm run android:branding
 ```
 
-Inside your main `<activity>` tag, add:
-```xml
-<intent-filter>
-    <action android:name="android.intent.action.MAIN" />
-    <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
-</intent-filter>
-```
+Rebuild and reinstall the APK to see the native icon. Publishing the website alone does not update an installed APK. Some TV launchers cache artwork; restart the launcher/TV if the old icon remains after installing the new APK. Native compilation and physical-TV display still require local verification.
 
 ### 8. Run on Your Android TV Device
 
@@ -145,7 +143,9 @@ npx cap sync android
 ## Next Steps
 
 - Test all game features on your TV
-- Customize the app icon for TV (in `android/app/src/main/res/`)
+- Rebuild and reinstall the APK after changing native launcher artwork
 - Consider publishing to Google Play Store once ready
 
 Happy gaming on the big screen! 🎮📺
+
+For more background, read the [Lovable native mobile development guide](https://lovable.dev/blog/capacitor-mobile-apps).

@@ -6,3 +6,4 @@
 - Store eleven versioned completed-score records to show ten previous runs separately from the current run without erasing legacy scores.
 - Keep reveal deadlines and answer-acceptance rules separate from decorative motion so pause and expiry cannot rescore or truncate accepted feedback.
 - Use a responsive fixed-anchor answer grid and separate score/rank progress views to preserve TV-safe geometry and a concise result screen.
+- Install native launcher branding from CDN pointers during Android sync and patch the existing manifest idempotently; this preserves local Java/Gradle fixes and packages real PNG resources instead of pointer files.

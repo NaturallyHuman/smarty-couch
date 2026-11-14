@@ -8,7 +8,9 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "android:branding": "node scripts/android-tv-branding.mjs",
+    "capacitor:sync:after": "node scripts/android-tv-branding.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^7.4.3",
@@ -73,6 +75,7 @@
     "@types/react": "^18.3.23",
     "@types/react-dom": "^18.3.7",
     "@vitejs/plugin-react-swc": "^3.11.0",
+    "@xmldom/xmldom": "^0.9.12",
     "autoprefixer": "^10.4.21",
     "eslint": "^9.32.0",
     "eslint-plugin-react-hooks": "^5.2.0",
